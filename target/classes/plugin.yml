@@ -2,3 +2,4 @@ name: Shade
 version: 1.0
 main: io.shadowrealm.Shade
 api-version: 1.13
+depend: [Fulcrum]
