@@ -1,89 +1,55 @@
 package io.shadowrealm;
 
-import java.io.IOException;
+import com.volmit.phantom.plugin.Module;
+import com.volmit.phantom.plugin.SVC;
+import com.volmit.phantom.plugin.Scaffold.Command;
+import com.volmit.phantom.plugin.Scaffold.Config;
+import com.volmit.phantom.plugin.Scaffold.Instance;
+import com.volmit.phantom.plugin.Scaffold.ModuleInfo;
+import com.volmit.phantom.plugin.Scaffold.Permission;
+import com.volmit.phantom.plugin.Scaffold.Start;
+import com.volmit.phantom.plugin.Scaffold.Stop;
+import com.volmit.phantom.text.C;
 
-import org.bukkit.Material;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.inventory.ItemStack;
+import io.shadowrealm.command.CommandMap;
+import io.shadowrealm.command.CommandShade;
+import io.shadowrealm.shade.permission.PermissionShade;
+import io.shadowrealm.shade.services.LobbySVC;
 
-import com.volmit.fulcrum.bukkit.TICK;
-import com.volmit.fulcrum.custom.ContentManager;
-import com.volmit.fulcrum.event.ContentRecipeRegistryEvent;
-import com.volmit.fulcrum.event.ContentRegistryEvent;
-import com.volmit.volume.bukkit.U;
-import com.volmit.volume.bukkit.VolumePlugin;
-import com.volmit.volume.bukkit.command.CommandTag;
-import com.volmit.volume.bukkit.pawn.Start;
-import com.volmit.volume.bukkit.pawn.Stop;
-import com.volmit.volume.bukkit.pawn.Tick;
-import com.volmit.volume.bukkit.service.IService;
-
-import io.shadowrealm.custom.item.ItemSackOfHolding;
-import io.shadowrealm.notification.AdvancementNotification;
-import io.shadowrealm.service.NotificationSVC;
-
-@CommandTag("&8[&5&lSRL&r&8]&7: ")
-public class Shade extends VolumePlugin
+@ModuleInfo(name = "Shade", version = "1.0", author = "cyberpwn", color = C.DARK_PURPLE)
+public class Shade extends Module
 {
+	@Config("config")
+	public static ShadowConfig config;
+
+	@Permission
+	public static PermissionShade perm;
+
+	@Command
+	public CommandShade shade;
+
+	@Command("Map")
+	public CommandMap map;
+
+	@Instance
 	public static Shade instance;
 
 	@Start
 	public void start()
 	{
-		instance = this;
-		kickFulcrum();
-	}
-
-	@Tick
-	public void tick()
-	{
-		TICK.tick++;
+		if(config.COMPONENT_LOBBY_ENABLED)
+		{
+			l("Enabling Lobby Service");
+			SVC.start(LobbySVC.class);
+		}
 	}
 
 	@Stop
 	public void stop()
 	{
-
-	}
-
-	@EventHandler
-	public void on(ContentRegistryEvent e)
-	{
-		e.register(new ItemSackOfHolding());
-	}
-
-	@EventHandler
-	public void on(ContentRecipeRegistryEvent e)
-	{
-
-	}
-
-	@EventHandler
-	public void on(PlayerSwapHandItemsEvent e)
-	{
-		AdvancementNotification an = new AdvancementNotification("Shadow Progression\n+17SXP");
-		an.setIs(new ItemStack(Material.GOLDEN_APPLE));
-		U.getService(NotificationSVC.class).queue(an);
-	}
-
-	public static <T extends IService> void startService(Class<? extends T> t)
-	{
-		VolumePlugin.vpi.getService(t);
-	}
-
-	private void kickFulcrum()
-	{
-		try
+		if(config.COMPONENT_LOBBY_ENABLED)
 		{
-			ContentManager.cacheResources(this);
+			SVC.get(LobbySVC.class).close();
 		}
-
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-
-		ContentManager.reloadContentManager();
 	}
 }

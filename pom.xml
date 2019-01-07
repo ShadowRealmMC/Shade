@@ -34,27 +34,6 @@
 		</resources>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.1.0</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<relocations>
-						<relocation>
-							<pattern>com.volmit.volume</pattern>
-							<shadedPattern>io.shadowrealm.volume</shadedPattern>
-						</relocation>
-					</relocations>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.2</version>
@@ -79,6 +58,10 @@
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
+		<repository>
+			<id>fawe-repo</id>
+			<url>http://ci.athion.net/job/FastAsyncWorldEdit/ws/mvn/</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -89,13 +72,9 @@
 		</dependency>
 		<dependency>
 			<groupId>com.volmit</groupId>
-			<artifactId>VolumePlugin</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.volmit</groupId>
-			<artifactId>Fulcrum</artifactId>
-			<version>E25</version>
+			<artifactId>Phantom</artifactId>
+			<version>3.1.29</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

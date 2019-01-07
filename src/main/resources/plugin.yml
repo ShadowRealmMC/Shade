@@ -1,5 +1,0 @@
-name: ${project.name}
-version: ${project.version}
-main: io.shadowrealm.Shade
-api-version: 1.13
-depend: [Fulcrum]
