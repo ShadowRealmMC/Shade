@@ -62,6 +62,10 @@
 			<id>fawe-repo</id>
 			<url>http://ci.athion.net/job/FastAsyncWorldEdit/ws/mvn/</url>
 		</repository>
+		<repository>
+			<id>volmit</id>
+			<url>http://nexus.volmit.com/content/repositories/volmit</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
