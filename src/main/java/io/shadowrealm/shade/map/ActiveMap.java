@@ -1,5 +1,6 @@
 package io.shadowrealm.shade.map;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -303,12 +304,12 @@ public class ActiveMap implements Listener
 
 	public Location getRandomSpawn()
 	{
-		return mapData.getSpawns().pickRandom().getPosition().getLocation(rift.getWorld());
+		return new GList<>(mapData.getSpawns()).pickRandom().getPosition().getLocation(rift.getWorld());
 	}
 
 	public MapColor sampleColor(Location currentLocation)
 	{
-		return (MapColor) getClosest(currentLocation, mapData.getColors().v());
+		return (MapColor) getClosest(currentLocation, new GList<MapColor>(mapData.getColors().values()));
 	}
 
 	public MapRegion sampleRegion(Location currentLocation)
@@ -321,7 +322,7 @@ public class ActiveMap implements Listener
 		return (MapMusic) getClosest(currentLocation, mapData.getMusic());
 	}
 
-	public MapWorldObject getClosest(Location currentLocation, GList<? extends MapWorldObject> pos)
+	public MapWorldObject getClosest(Location currentLocation, List<? extends MapWorldObject> pos)
 	{
 		double m = Double.MAX_VALUE;
 		MapWorldObject closest = null;

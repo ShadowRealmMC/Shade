@@ -1,9 +1,12 @@
 package io.shadowrealm.shade.map;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.volmit.phantom.lang.GList;
-import com.volmit.phantom.lang.GMap;
 
 public class MapData implements Serializable
 {
@@ -13,10 +16,18 @@ public class MapData implements Serializable
 	private int width;
 	private int depth;
 	private MapPosition center;
-	private GList<MapSpawn> spawns = new GList<>();
-	private GList<MapRegion> regions = new GList<>();
-	private GList<MapMusic> music = new GList<>();
-	private GMap<ColorSpace, MapColor> colors = new GMap<>();
+	private List<MapSpawn> spawns;
+	private List<MapRegion> regions;
+	private List<MapMusic> music;
+	private Map<ColorSpace, MapColor> colors;
+
+	public MapData()
+	{
+		spawns = new ArrayList<>();
+		regions = new ArrayList<>();
+		music = new ArrayList<>();
+		colors = new HashMap<>();
+	}
 
 	public String getName()
 	{
@@ -48,7 +59,7 @@ public class MapData implements Serializable
 		this.author = author;
 	}
 
-	public GList<MapSpawn> getSpawns()
+	public List<MapSpawn> getSpawns()
 	{
 		return spawns;
 	}
@@ -58,7 +69,7 @@ public class MapData implements Serializable
 		this.spawns = spawns;
 	}
 
-	public GList<MapRegion> getRegions()
+	public List<MapRegion> getRegions()
 	{
 		return regions;
 	}
@@ -68,7 +79,7 @@ public class MapData implements Serializable
 		this.regions = regions;
 	}
 
-	public GList<MapMusic> getMusic()
+	public List<MapMusic> getMusic()
 	{
 		return music;
 	}
@@ -78,12 +89,12 @@ public class MapData implements Serializable
 		this.music = music;
 	}
 
-	public GMap<ColorSpace, MapColor> getColors()
+	public Map<ColorSpace, MapColor> getColors()
 	{
 		return colors;
 	}
 
-	public void setColors(GMap<ColorSpace, MapColor> colors)
+	public void setColors(Map<ColorSpace, MapColor> colors)
 	{
 		this.colors = colors;
 	}

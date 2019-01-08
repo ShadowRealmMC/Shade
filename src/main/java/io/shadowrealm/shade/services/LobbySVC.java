@@ -1,9 +1,11 @@
 package io.shadowrealm.shade.services;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
+import java.util.UUID;
 
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -30,7 +32,6 @@ import com.volmit.phantom.util.Cuboid;
 
 import io.shadowrealm.shade.map.ActiveMap;
 import io.shadowrealm.shade.map.CompiledMap;
-import io.shadowrealm.shade.map.MapData;
 import io.shadowrealm.shade.map.config.MapConfig;
 
 public class LobbySVC extends AsyncTickService
@@ -41,12 +42,10 @@ public class LobbySVC extends AsyncTickService
 	private ActiveMap activeMap;
 	private Cuboid region;
 	private GList<MapConfig> configs;
-	private boolean caching;
 
 	public LobbySVC()
 	{
 		super(0);
-		caching = false;
 		configs = new GList<>();
 	}
 
@@ -83,36 +82,17 @@ public class LobbySVC extends AsyncTickService
 				rift = createRift();
 				rift.load();
 
-				if(!caching)
+				w("No Cached Map! We must build it from scratch!");
+
+				try
 				{
-					w("No Cached Map! We must build it from scratch!");
-
-					try
-					{
-						constructMap();
-						compileMap();
-					}
-
-					catch(Throwable e)
-					{
-						e.printStackTrace();
-					}
+					constructMap();
+					compileMap();
 				}
 
-				else
+				catch(Throwable e)
 				{
-					l("Using Cached Map!");
-
-					try
-					{
-						constructCachedMap();
-						compileCachedMap();
-					}
-
-					catch(Throwable e)
-					{
-						e.printStackTrace();
-					}
+					e.printStackTrace();
 				}
 			}
 		};
@@ -242,7 +222,6 @@ public class LobbySVC extends AsyncTickService
 	public void onAsyncTick()
 	{
 
-
 		return;
 	}
 
@@ -268,19 +247,8 @@ public class LobbySVC extends AsyncTickService
 
 		rift.setForceLoadX(x);
 		rift.setForceLoadZ(z);
-		rift.setTileTickLimit(1000);
-		rift.setPhysicsThrottle(0);
+		rift.setPhysicsThrottle(10);
 		rift.slowlyPreload();
-
-		new S(200)
-		{
-			@Override
-			public void run()
-			{
-				rift.setTileTickLimit(0.25);
-				rift.setPhysicsThrottle(200);
-			}
-		};
 
 		l("Lobby Service Fully Operational!");
 	}
@@ -300,10 +268,13 @@ public class LobbySVC extends AsyncTickService
 
 				try
 				{
-					FSTConfiguration conf = FSTConfiguration.createJsonConfiguration();
+					FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
 					Object p = map.getMap();
-					byte[] bytes = conf.asByteArray(p);
-					VIO.writeAll(new File(rift.getWorldFolder(), "cache.json"), new String(bytes, "UTF-8"));
+					ByteArrayInputStream os = new ByteArrayInputStream(conf.asByteArray(p));
+					File f = new File(rift.getWorldFolder(), "cache.fst");
+					FileOutputStream fos = new FileOutputStream(f);
+					VIO.fillTransfer(os, fos);
+					fos.close();
 				}
 
 				catch(Throwable e)
@@ -316,26 +287,6 @@ public class LobbySVC extends AsyncTickService
 
 			}
 		});
-	}
-
-	private void compileCachedMap()
-	{
-		l("Re-Compiling Cached Map");
-
-		try
-		{
-			FSTConfiguration conf = FSTConfiguration.createJsonConfiguration();
-			MapData deser = (MapData) conf.asObject(VIO.readAll(new File(rift.getWorldFolder(), "cache.json")).getBytes(StandardCharsets.UTF_8));
-			map = new CompiledMap(deser);
-			l("Loaded Compiled Map Cache");
-			l("Starting Map!");
-			startMap();
-		}
-
-		catch(Throwable e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	private void constructMap() throws Throwable
@@ -365,37 +316,12 @@ public class LobbySVC extends AsyncTickService
 		SVC.get(LightSVC.class).relight(region);
 	}
 
-	private void constructCachedMap() throws Throwable
-	{
-		l("Constructing Map from schematic: " + conf.getSchematic());
-		File schematic = new File(getSchematicFolder(), conf.getSchematic());
-		WorldEditSVC w = SVC.get(WorldEditSVC.class);
-		l("Reading Map Schematic " + conf.getSchematic());
-		Vector v = w.getOffset(schematic);
-		Cuboid rg = w.getCuboid(rift.getWorld(), w.getSchematic(schematic).getClipboard().getRegion());
-		//@builder
-		region = new Cuboid(
-				new Location(rift.getWorld(), rg.getSizeX() /2, 255, rg.getSizeZ()/2).clone().add(v),
-				new Location(rift.getWorld(), -rg.getSizeX()/2, 0, -rg.getSizeZ()/2).clone().add(v));
-		//@done
-		l(region.getLowerNE(), region.getUpperSW());
-		rift.setWorldBorderCenter(region.getCenter().getX(), region.getCenter().getZ());
-		rift.setWorldBorderEnabled(true);
-		rift.setWorldBorderSize(Math.max(region.getSizeX(), region.getSizeZ()) * 3);
-		l(v.toString());
-	}
-
 	private Rift createRift()
 	{
 		try
 		{
-			if(SVC.get(RiftSVC.class).hasRift("lobby/" + conf.id()))
-			{
-				caching = true;
-			}
-
 			//@builder
-			return SVC.get(RiftSVC.class).getOrCreate("lobby/" + conf.id())
+			return SVC.get(RiftSVC.class).getOrCreate("lobby/" + conf.id() + "-" + UUID.randomUUID().toString())
 					.setAllowBosses(false)
 					.setMaxTNTUpdatesPerTick(1)
 					.setArrowDespawnRate(5)
@@ -415,6 +341,7 @@ public class LobbySVC extends AsyncTickService
 					.setHopperTransferAmount(64)
 					.setHopperTransferRate(100)
 					.setNerfSpawnerMobs(true)
+					.setTemporary(true)
 					.setForcedGameMode(GameMode.ADVENTURE);
 			//@done
 		}
