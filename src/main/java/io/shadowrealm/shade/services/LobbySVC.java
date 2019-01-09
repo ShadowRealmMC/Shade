@@ -1,37 +1,41 @@
 package io.shadowrealm.shade.services;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.nustaq.serialization.FSTConfiguration;
 
 import com.sk89q.worldedit.EditSession;
 import com.volmit.phantom.json.JSONException;
 import com.volmit.phantom.json.JSONObject;
 import com.volmit.phantom.lang.Callback;
 import com.volmit.phantom.lang.GList;
+import com.volmit.phantom.lang.GMap;
 import com.volmit.phantom.lang.VIO;
+import com.volmit.phantom.plugin.A;
 import com.volmit.phantom.plugin.AsyncTickService;
 import com.volmit.phantom.plugin.S;
 import com.volmit.phantom.plugin.SVC;
 import com.volmit.phantom.rift.Rift;
 import com.volmit.phantom.rift.RiftException;
 import com.volmit.phantom.rift.VoidGenerator;
-import com.volmit.phantom.services.LightSVC;
 import com.volmit.phantom.services.RiftSVC;
 import com.volmit.phantom.services.WorldEditSVC;
+import com.volmit.phantom.text.C;
+import com.volmit.phantom.text.ProgressSpinner;
 import com.volmit.phantom.util.Cuboid;
+import com.volmit.phantom.util.PE;
 
 import io.shadowrealm.shade.map.ActiveMap;
 import io.shadowrealm.shade.map.CompiledMap;
+import io.shadowrealm.shade.map.PayloadThread;
 import io.shadowrealm.shade.map.config.MapConfig;
 
 public class LobbySVC extends AsyncTickService
@@ -42,58 +46,111 @@ public class LobbySVC extends AsyncTickService
 	private ActiveMap activeMap;
 	private Cuboid region;
 	private GList<MapConfig> configs;
+	public boolean ready;
+	public String status;
 
 	public LobbySVC()
 	{
 		super(0);
+		ready = false;
+		status = "Please Wait";
 		configs = new GList<>();
 	}
 
 	@Override
 	public void onBegin()
 	{
+		ready = false;
 		handleFiles();
 
-		new S(20)
+		new S()
 		{
 			@Override
 			public void run()
 			{
-				if(rift == null)
+				new A()
 				{
-					try
+					@Override
+					public void run()
 					{
-						if(getPotentialMaps().isEmpty())
+						GMap<Player, ProgressSpinner> px = new GMap<>();
+
+						new PayloadThread(new Runnable()
 						{
-							f("No potential maps found!");
-							return;
+							@Override
+							public void run()
+							{
+								for(Player i : Bukkit.getOnlinePlayers())
+								{
+									if(!px.containsKey(i))
+									{
+										px.put(i, ProgressSpinner.DEFAULT);
+									}
+
+									new S()
+									{
+										@Override
+										public void run()
+										{
+											i.teleport(i.getLocation().clone().add(0, 100, 0));
+											PE.BLINDNESS.a(100).d(1000).apply(i);
+										}
+									};
+
+									i.sendTitle("", C.LIGHT_PURPLE + px.get(i).toString() + " " + C.DARK_GRAY + "" + C.BOLD + status, 0, 10000, 20);
+								}
+							}
+						}).start();
+
+						try
+						{
+							status = "Searching for Maps";
+							if(getPotentialMaps().isEmpty())
+							{
+								f("No potential maps found!");
+								return;
+							}
+
+							l("Potential Maps: " + getPotentialMaps().size());
+							conf = getPotentialMaps().pickRandom();
+							l("Selected Map: " + conf.getMapName() + " // " + conf.getVariationName() + " (" + conf.getSchematic() + ")");
+
+							new S()
+							{
+								@Override
+								public void run()
+								{
+									rift = createRift();
+									rift.load();
+
+									w("No Cached Map! We must build it from scratch!");
+
+									try
+									{
+										constructMap(new Runnable()
+										{
+											@Override
+											public void run()
+											{
+												compileMap();
+											}
+										});
+									}
+
+									catch(Throwable e)
+									{
+										e.printStackTrace();
+									}
+								}
+							};
 						}
 
-						conf = getPotentialMaps().pickRandom();
-						l("Selected Map: " + conf.getMapName() + " // " + conf.getVariationName() + " (" + conf.getSchematic() + ")");
+						catch(Throwable e)
+						{
+							e.printStackTrace();
+						}
 					}
-
-					catch(Throwable e)
-					{
-						e.printStackTrace();
-					}
-				}
-
-				rift = createRift();
-				rift.load();
-
-				w("No Cached Map! We must build it from scratch!");
-
-				try
-				{
-					constructMap();
-					compileMap();
-				}
-
-				catch(Throwable e)
-				{
-					e.printStackTrace();
-				}
+				};
 			}
 		};
 	}
@@ -249,12 +306,14 @@ public class LobbySVC extends AsyncTickService
 		rift.setForceLoadZ(z);
 		rift.setPhysicsThrottle(10);
 		rift.slowlyPreload();
+		status = "Preloading";
 
 		l("Lobby Service Fully Operational!");
 	}
 
 	private void compileMap()
 	{
+		status = "Compiling";
 		l("Compiling Map");
 		SVC.get(MapBuilderSVC.class).compile(region, true, new Callback<CompiledMap>()
 		{
@@ -264,56 +323,65 @@ public class LobbySVC extends AsyncTickService
 				l("Map Compiled");
 				map = t;
 				l(map.getWarnings().size() + " Warnings");
-				l("Saving Cache...");
-
-				try
-				{
-					FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
-					Object p = map.getMap();
-					ByteArrayInputStream os = new ByteArrayInputStream(conf.asByteArray(p));
-					File f = new File(rift.getWorldFolder(), "cache.fst");
-					FileOutputStream fos = new FileOutputStream(f);
-					VIO.fillTransfer(os, fos);
-					fos.close();
-				}
-
-				catch(Throwable e)
-				{
-					e.printStackTrace();
-				}
-
+				status = "Starting Rift";
 				l("Starting Map!");
 				startMap();
-
 			}
 		});
 	}
 
-	private void constructMap() throws Throwable
+	private void constructMap(Runnable done) throws Throwable
 	{
-		l("Constructing Map from schematic: " + conf.getSchematic());
-		File schematic = new File(getSchematicFolder(), conf.getSchematic());
-		WorldEditSVC w = SVC.get(WorldEditSVC.class);
-		EditSession e = w.getEditSession(rift.getWorld());
-		l("Reading Map Schematic " + conf.getSchematic());
-		Vector v = w.getOffset(schematic);
-		Cuboid rg = w.getCuboid(rift.getWorld(), w.getSchematic(schematic).getClipboard().getRegion());
-		//@builder
-		region = new Cuboid(
-				new Location(rift.getWorld(), rg.getSizeX() /2, 255, rg.getSizeZ()/2).clone().add(v),
-				new Location(rift.getWorld(), -rg.getSizeX()/2, 0, -rg.getSizeZ()/2).clone().add(v));
-		//@done
+		new A()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					status = "Fabricating";
+					l("Constructing Map from schematic: " + conf.getSchematic());
+					File schematic = new File(getSchematicFolder(), conf.getSchematic());
+					WorldEditSVC w = SVC.get(WorldEditSVC.class);
+					EditSession e = w.getEditSession(rift.getWorld());
+					l("Reading Map Schematic " + conf.getSchematic());
+					status = "Reading Blueprint";
+					Vector v = w.getOffset(schematic);
+					Cuboid rg = w.getCuboid(rift.getWorld(), w.getSchematic(schematic).getClipboard().getRegion());
+					//@builder
+					region = new Cuboid(
+							new Location(rift.getWorld(), rg.getSizeX() /2, 255, rg.getSizeZ()/2).clone().add(v),
+							new Location(rift.getWorld(), -rg.getSizeX()/2, 0, -rg.getSizeZ()/2).clone().add(v));
+					//@done
 
-		l(region.getLowerNE(), region.getUpperSW());
-		rift.setWorldBorderCenter(region.getCenter().getX(), region.getCenter().getZ());
-		rift.setWorldBorderEnabled(true);
-		rift.setWorldBorderSize(Math.max(region.getSizeX(), region.getSizeZ()) * 3);
-		l("Streaming Blocks from schematic into rift");
-		l(v.toString());
-		w.pasteSchematic(schematic, e, new Location(rift.getWorld(), v.getX(), -v.getY(), v.getZ()));
-		e.flushQueue();
-		l("Touching up map lighting");
-		SVC.get(LightSVC.class).relight(region);
+					l(region.getLowerNE(), region.getUpperSW());
+					status = "Setting Border";
+					rift.setWorldBorderCenter(region.getCenter().getX(), region.getCenter().getZ());
+					rift.setWorldBorderEnabled(true);
+					rift.setWorldBorderSize(Math.max(region.getSizeX(), region.getSizeZ()) * 3);
+					l("Streaming Blocks from schematic into rift");
+					status = "Streaming Blocks";
+					l(v.toString());
+					w.pasteSchematic(schematic, e, new Location(rift.getWorld(), v.getX(), -v.getY(), v.getZ()));
+					status = "Flushing Blocks";
+					e.flushQueue();
+				}
+
+				catch(Throwable e1)
+				{
+					e1.printStackTrace();
+				}
+
+				new S()
+				{
+					@Override
+					public void run()
+					{
+						done.run();
+					}
+				};
+			}
+		};
 	}
 
 	private Rift createRift()
@@ -326,17 +394,23 @@ public class LobbySVC extends AsyncTickService
 					.setMaxTNTUpdatesPerTick(1)
 					.setArrowDespawnRate(5)
 					.setXPMergeRadius(10)
-					.setItemMergeRadius(10)
-					.setItemDespawnRate(100)
+					.setItemMergeRadius(1)
+					.setItemDespawnRate(1)
 					.setEntityTickLimit(0.51)
 					.setTileTickLimit(0.51)
 					.setPhysicsThrottle(100)
-					.setAnimalActivationRange(5)
+					.setAnimalActivationRange(32)
 					.setPlayerTrackingRange(64)
-					.setMiscActivationRange(5)
-					.setMonsterActivationRange(5)
+					.setMiscActivationRange(32)
+					.setMonsterActivationRange(32)
 					.setTemporary(false)
 					.setGenerator(VoidGenerator.class)
+					.setRule("doTileDrops", "false")
+					.setRule("doMobDrops", "false")
+					.setRule("randomTickSpeed", "false")
+					.setRule("doDaylightCycle", "false")
+					.setRule("keepInventory", "false")
+					.setRandomLightUpdates(false)
 					.setHopperCheckRate(100)
 					.setHopperTransferAmount(64)
 					.setHopperTransferRate(100)
@@ -352,5 +426,10 @@ public class LobbySVC extends AsyncTickService
 		}
 
 		return null;
+	}
+
+	public MapConfig getConfig()
+	{
+		return conf;
 	}
 }

@@ -1,4 +1,4 @@
-package io.shadowrealm;
+package io.shadowrealm.shade;
 
 import com.volmit.phantom.plugin.Module;
 import com.volmit.phantom.plugin.SVC;
@@ -11,8 +11,8 @@ import com.volmit.phantom.plugin.Scaffold.Start;
 import com.volmit.phantom.plugin.Scaffold.Stop;
 import com.volmit.phantom.text.C;
 
-import io.shadowrealm.command.CommandMap;
-import io.shadowrealm.command.CommandShade;
+import io.shadowrealm.shade.command.CommandMap;
+import io.shadowrealm.shade.command.CommandShade;
 import io.shadowrealm.shade.permission.PermissionShade;
 import io.shadowrealm.shade.services.LobbySVC;
 

@@ -9,6 +9,7 @@ public class MapConfig
 	private String mapName;
 	private String variationName;
 	private String mapAuthors;
+	private int time;
 	private String activation; // always || MONTH/DAY
 	private GList<String> replacements;
 
@@ -16,6 +17,7 @@ public class MapConfig
 	{
 		this.schematic = "null.schematic";
 		this.mapName = "Map Name";
+		this.time = 6000;
 		this.variationName = "Variation Name";
 		this.mapAuthors = "Tragic_Psycho & SwiftSweat";
 		this.activation = "ALWAYS";
@@ -36,6 +38,7 @@ public class MapConfig
 	public void fromJSON(JSONObject j)
 	{
 		schematic = j.getString("schematic");
+		time = j.getInt("time");
 		mapName = j.getString("name");
 		variationName = j.getString("variation");
 		mapAuthors = j.getString("authors");
@@ -48,6 +51,7 @@ public class MapConfig
 		JSONObject j = new JSONObject();
 		j.put("schematic", schematic);
 		j.put("name", mapName);
+		j.put("time", time);
 		j.put("variation", variationName);
 		j.put("authors", mapAuthors);
 		j.put("activation", activation);
@@ -114,5 +118,15 @@ public class MapConfig
 	public void setReplacements(GList<String> replacements)
 	{
 		this.replacements = replacements;
+	}
+
+	public int getTime()
+	{
+		return time;
+	}
+
+	public void setTime(int time)
+	{
+		this.time = time;
 	}
 }

@@ -1,0 +1,4 @@
+name: Shade
+main: io.shadowrealm.shade.proxy.ShadeBungeecord
+version: 1.0
+author: cyberpwn

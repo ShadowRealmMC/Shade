@@ -1,17 +1,24 @@
 package io.shadowrealm.shade.map;
 
+import java.util.Iterator;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.volmit.phantom.plugin.AR;
@@ -24,11 +31,18 @@ import com.volmit.phantom.services.NMSSVC;
 import com.volmit.phantom.services.ViaVersionSVC;
 import com.volmit.phantom.text.C;
 import com.volmit.phantom.time.M;
+import com.volmit.phantom.util.BlastResistance;
 import com.volmit.phantom.util.ColoredParticleEffect;
+import com.volmit.phantom.util.Cuboid;
+import com.volmit.phantom.util.Cuboid.CuboidDirection;
+import com.volmit.phantom.util.PE;
 import com.volmit.phantom.util.ParticleEffect;
 import com.volmit.phantom.util.Protocol;
 import com.volmit.phantom.util.RecordType;
 import com.volmit.phantom.util.VectorMath;
+
+import io.shadowrealm.shade.Shade;
+import io.shadowrealm.shade.services.LobbySVC;
 
 public class ActivePlayer implements Listener
 {
@@ -41,13 +55,31 @@ public class ActivePlayer implements Listener
 	private AR ar;
 	private SR sr;
 	private boolean destroyed;
+	private double energy;
+	private double maxEnergy;
+	private int delayEnergy;
+	private int introLevel;
 
 	public ActivePlayer(Player player, ActiveMap map)
 	{
+		introLevel = 0;
+		delayEnergy = Shade.config.COMPONENT_LOBBY_ENERGY_REGEN_DELAY;
 		this.player = player;
 		this.map = map;
 		Bukkit.getPluginManager().registerEvents(this, PhantomPlugin.plugin);
-		ar = new AR(100)
+		maxEnergy = Shade.config.COMPONENT_LOBBY_ENERGY_MAX;
+		energy = Shade.config.COMPONENT_LOBBY_ENERGY_START;
+
+		new S()
+		{
+			@Override
+			public void run()
+			{
+				PE.BLINDNESS.a(10).d(10000).apply(player);
+			}
+		};
+
+		ar = new AR(Shade.config.COMPONENT_LOBBY_SAMPLERATE)
 		{
 			@Override
 			public void run()
@@ -94,47 +126,138 @@ public class ActivePlayer implements Listener
 		};
 	}
 
+	public boolean can(double energy)
+	{
+		if(this.energy > energy)
+		{
+			delayEnergy = Shade.config.COMPONENT_LOBBY_ENERGY_REGEN_DELAY;
+			this.energy -= energy;
+			return true;
+		}
+
+		return false;
+	}
+
+	@EventHandler
+	public void on(PlayerToggleSprintEvent e)
+	{
+		if(!e.getPlayer().equals(player) || !player.getWorld().equals(map.getRift().getWorld()))
+		{
+			return;
+		}
+		new S()
+		{
+			@Override
+			public void run()
+			{
+				if(e.getPlayer().isSprinting())
+				{
+					if(can(20))
+					{
+						e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().clone().multiply(1.5));
+
+						for(int i = 0; i < 16; i++)
+						{
+							new ColoredParticleEffect(Color.fromRGB(33, 33, 33)).play(player.getLocation().clone().add(Vector.getRandom().subtract(Vector.getRandom()).multiply(6)));
+						}
+
+						player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENDERCHEST_OPEN, 1f, 0.37f);
+					}
+
+					else
+					{
+						player.setSprinting(false);
+					}
+				}
+			}
+		};
+	}
+
 	protected void tickSync()
 	{
+		if(!player.getWorld().equals(map.getRift().getWorld()))
+		{
+			return;
+		}
+
 		if(player.isFlying())
 		{
 			player.setFlySpeed(0.1f);
 			player.setFlying(false);
 			player.setAllowFlight(false);
-			org.bukkit.util.Vector direction = player.getLocation().getDirection().clone();
-			direction.setY(0.25);
-			direction.normalize();
-			direction.multiply(3.5f);
 
-			if(player.isSneaking())
+			if(can(27))
 			{
-				direction.multiply(1.35f);
-				player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 10f, 1.57f);
-			}
+				org.bukkit.util.Vector direction = player.getLocation().getDirection().clone();
+				direction.setY(0.25);
+				direction.normalize();
+				direction.multiply(1.73f);
 
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.57f);
-			ParticleEffect.SMOKE_NORMAL.display(0.24f, 14, player.getLocation(), 64);
-			player.setVelocity(direction);
+				if(player.isSneaking() && can(95))
+				{
+					direction = player.getLocation().getDirection().clone().normalize();
+					direction.multiply(3.25f);
+					player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 10f, 1.57f);
+				}
+
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.57f);
+				ParticleEffect.SMOKE_NORMAL.display(0.24f, 14, player.getLocation(), 64);
+				player.setVelocity(direction);
+			}
 		}
 
 		if(player.isOnGround())
 		{
-			player.setAllowFlight(true);
+			if(energy > 66)
+			{
+				player.setAllowFlight(true);
+			}
+
+			else
+			{
+				player.setAllowFlight(false);
+			}
+
+			if(player.isSprinting())
+			{
+				if(can(0.86))
+				{
+					PE.SPEED.a(3).d(10).apply(player);
+				}
+
+				else
+				{
+					player.setSprinting(false);
+				}
+			}
 		}
 
 		else if(player.isGliding() && !player.isSneaking())
 		{
 			player.setGliding(false);
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 1f, 0.57f);
+
+			for(int i = 0; i < 16; i++)
+			{
+				new ColoredParticleEffect(Color.fromRGB(33, 33, 33)).play(player.getLocation().clone().add(Vector.getRandom().subtract(Vector.getRandom()).multiply(6)));
+			}
+
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 0.53f, 0.57f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 0.15f, 0.57f);
 		}
 
-		else if(!player.isGliding() && player.isSneaking())
+		else if(!player.isGliding() && player.isSneaking() && !player.isOnGround())
 		{
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 1f, 0.57f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 1.25f, 0.57f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 0.45f, 0.57f);
 			player.setGliding(true);
+
+			for(int i = 0; i < 16; i++)
+			{
+				new ColoredParticleEffect(Color.fromRGB(33, 33, 33)).play(player.getLocation().clone().add(Vector.getRandom().subtract(Vector.getRandom()).multiply(6)));
+			}
 		}
 
-		if(player.isGliding())
+		if(player.isGliding() && VectorMath.getSpeed(player.getVelocity().clone()) < 1.0 && can(3.28))
 		{
 			int speedr = (int) ((M.clip(VectorMath.getSpeed(player.getVelocity()), 0, 6) / 6D) * 255);
 			int speedg = (int) ((M.clip(VectorMath.getSpeed(player.getVelocity()), 0, 1) / 1D) * 255);
@@ -144,6 +267,70 @@ public class ActivePlayer implements Listener
 			{
 				new ColoredParticleEffect(Color.fromRGB(speedr, speedg, speedb)).play(player.getLocation().clone().add(player.getVelocity().clone().multiply(2.25f)).clone().add(Vector.getRandom().subtract(Vector.getRandom()).clone().multiply(VectorMath.getSpeed(player.getVelocity()))));
 			}
+
+			player.setVelocity(player.getVelocity().clone().add(player.getLocation().getDirection().clone().multiply(0.074)));
+		}
+
+		if(Shade.config.COMPONENT_LOBBY_BLOCK_DESTRUCTION && player.isGliding())
+		{
+			Vector d = player.getVelocity();
+			double speed = VectorMath.getSpeed(d);
+			speed *= 1.25;
+			Cuboid c = new Cuboid(player.getLocation(), player.getLocation().clone().add(d.clone().multiply(3.25)));
+			Iterator<Block> b = c.iterator();
+			c.outset(CuboidDirection.Both, 1);
+
+			while(b.hasNext())
+			{
+				Block block = b.next();
+
+				if(block.isEmpty())
+				{
+					continue;
+				}
+
+				double resistance = (double) BlastResistance.get(block.getType()) / 5D;
+
+				if(resistance > 0 && speed > resistance)
+				{
+					player.setVelocity(player.getVelocity().clone().multiply(0.94));
+					Material type = block.getType();
+					@SuppressWarnings("deprecation")
+					byte data = block.getData();
+					block.setType(Material.AIR);
+					@SuppressWarnings("deprecation")
+					FallingBlock fb = block.getWorld().spawnFallingBlock(block.getLocation().clone().add(0.5, 0, 0.5), type, data);
+					fb.setDropItem(false);
+					fb.setHurtEntities(true);
+					fb.setGravity(true);
+					fb.setVelocity(player.getVelocity().clone().multiply(1.25));
+				}
+			}
+		}
+
+		double current = player.getExp();
+		double actual = energy / maxEnergy;
+		if(actual > current)
+		{
+			current += ((actual - current) / 20);
+		}
+
+		else if(actual < current)
+		{
+			current -= ((current - actual) / 7);
+		}
+
+		actual = current;
+		player.setExp((float) M.clip(actual, 0, 1));
+
+		if(delayEnergy > 0)
+		{
+			delayEnergy--;
+		}
+
+		else
+		{
+			energy = M.clip(energy + Shade.config.COMPONENT_LOBBY_ENERGY_REGEN_AMOUNT, 0, maxEnergy);
 		}
 	}
 
@@ -151,6 +338,50 @@ public class ActivePlayer implements Listener
 	private void tick()
 	{
 		Location currentLocation = player.getLocation().clone().add(player.getLocation().getDirection().clone().multiply(3));
+
+		if(!currentLocation.getWorld().equals(map.getRift().getWorld()))
+		{
+			return;
+		}
+
+		if(introLevel == 3)
+		{
+			introLevel++;
+		}
+
+		if(introLevel == 2)
+		{
+			introLevel++;
+			player.sendTitle(C.GOLD + C.translateAlternateColorCodes('&', SVC.get(LobbySVC.class).getConfig().getVariationName()), C.DARK_GRAY + "" + C.BOLD + "By " + C.GOLD + C.BOLD + C.translateAlternateColorCodes('&', SVC.get(LobbySVC.class).getConfig().getMapAuthors()), 15, 65, 100);
+		}
+
+		if(introLevel == 1)
+		{
+			introLevel++;
+		}
+
+		if(introLevel == 0)
+		{
+			introLevel++;
+			SVC.get(LobbySVC.class).ready = true;
+			player.sendTitle(C.BOLD + "" + C.LIGHT_PURPLE + "" + C.BOLD + "Shadow" + C.DARK_GRAY + C.BOLD + "Realms", C.GOLD + "" + C.BOLD + C.translateAlternateColorCodes('&', SVC.get(LobbySVC.class).getConfig().getMapName()), 15, 5, 100);
+
+			new S()
+			{
+				@Override
+				public void run()
+				{
+					player.removePotionEffect(PotionEffectType.BLINDNESS);
+					PE.BLINDNESS.a(100).d(20).apply(player);
+					player.teleport(map.getRandomSpawn());
+				}
+			};
+		}
+
+		if(introLevel < 0)
+		{
+			introLevel++;
+		}
 
 		if(map.isDebug())
 		{
@@ -180,7 +411,11 @@ public class ActivePlayer implements Listener
 			{
 				currentRegion = name;
 				currentMood = mood;
-				onRegionChanged();
+
+				if(introLevel >= 4)
+				{
+					onRegionChanged();
+				}
 			}
 		}
 

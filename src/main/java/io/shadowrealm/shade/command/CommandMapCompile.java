@@ -1,4 +1,4 @@
-package io.shadowrealm.command;
+package io.shadowrealm.shade.command;
 
 import com.volmit.phantom.lang.Callback;
 import com.volmit.phantom.lang.F;
@@ -11,7 +11,7 @@ import com.volmit.phantom.text.C;
 import com.volmit.phantom.util.Cuboid;
 import com.volmit.phantom.world.WorldEditor;
 
-import io.shadowrealm.Shade;
+import io.shadowrealm.shade.Shade;
 import io.shadowrealm.shade.map.CompiledMap;
 import io.shadowrealm.shade.map.MapPosition;
 import io.shadowrealm.shade.services.MapBuilderSVC;

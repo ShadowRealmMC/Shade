@@ -1,18 +1,17 @@
-package io.shadowrealm.command;
+package io.shadowrealm.shade.command;
 
 import com.volmit.phantom.plugin.PhantomCommand;
 import com.volmit.phantom.plugin.PhantomSender;
 import com.volmit.phantom.world.WorldEditor;
 
-import io.shadowrealm.Shade;
-import io.shadowrealm.shade.map.ActiveMap;
+import io.shadowrealm.shade.Shade;
 
-public class CommandMapTest extends PhantomCommand
+public class CommandMapExport extends PhantomCommand
 {
-	public CommandMapTest()
+	public CommandMapExport()
 	{
-		super("test", "rift");
-		requiresPermission(Shade.perm.map.test);
+		super("export", "save");
+		requiresPermission(Shade.perm.map.export);
 	}
 
 	@Override
@@ -24,8 +23,12 @@ public class CommandMapTest extends PhantomCommand
 			return true;
 		}
 
-		sender.sendMessage("Testing Map");
-		new ActiveMap(true, sender.player());
+		if(args.length != 1)
+		{
+			sender.sendMessage("/map export <name>");
+			return true;
+		}
+
 		return true;
 	}
 }

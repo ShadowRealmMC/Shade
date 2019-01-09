@@ -1,10 +1,10 @@
-package io.shadowrealm.command;
+package io.shadowrealm.shade.command;
 
 import com.volmit.phantom.plugin.PhantomCommand;
 import com.volmit.phantom.plugin.PhantomSender;
 import com.volmit.phantom.plugin.Scaffold.Command;
 
-import io.shadowrealm.Shade;
+import io.shadowrealm.shade.Shade;
 
 public class CommandMap extends PhantomCommand
 {

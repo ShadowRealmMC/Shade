@@ -8,8 +8,10 @@ import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ItemMergeEvent;
 
 import com.volmit.phantom.lang.Callback;
 import com.volmit.phantom.lang.D;
@@ -25,10 +27,13 @@ import com.volmit.phantom.rift.Rift;
 import com.volmit.phantom.rift.RiftException;
 import com.volmit.phantom.services.RiftSVC;
 import com.volmit.phantom.text.C;
+import com.volmit.phantom.time.M;
 import com.volmit.phantom.util.Cuboid;
+import com.volmit.phantom.util.VectorMath;
 import com.volmit.phantom.world.WorldEditor;
 
-import io.shadowrealm.Shade;
+import io.shadowrealm.shade.Shade;
+import io.shadowrealm.shade.services.LobbySVC;
 import io.shadowrealm.shade.services.MapBuilderSVC;
 
 public class ActiveMap implements Listener
@@ -236,12 +241,34 @@ public class ActiveMap implements Listener
 					shutdown();
 				}
 			}
+
+			if(M.interval(20))
+			{
+				new S()
+				{
+					@Override
+					public void run()
+					{
+						rift.getWorld().setFullTime(rift.getWorld().getFullTime() + 24000);
+						rift.getWorld().setTime(SVC.get(LobbySVC.class).getConfig().getTime());
+					}
+				};
+			}
 		}
 
 		catch(Throwable e)
 		{
 			e.printStackTrace();
 			shutdown();
+		}
+	}
+
+	@EventHandler
+	public void on(ItemMergeEvent e)
+	{
+		if(e.getEntity().getWorld().equals(getRift().getWorld()))
+		{
+			e.setCancelled(true);
 		}
 	}
 
@@ -261,7 +288,7 @@ public class ActiveMap implements Listener
 
 		catch(Throwable e)
 		{
-
+			e.printStackTrace();
 		}
 
 		if(rift.isLoaded())
@@ -276,7 +303,7 @@ public class ActiveMap implements Listener
 
 		catch(Throwable e)
 		{
-
+			e.printStackTrace();
 		}
 
 		HandlerList.unregisterAll(this);
@@ -304,7 +331,9 @@ public class ActiveMap implements Listener
 
 	public Location getRandomSpawn()
 	{
-		return new GList<>(mapData.getSpawns()).pickRandom().getPosition().getLocation(rift.getWorld());
+		Location ll = new GList<>(mapData.getSpawns()).pickRandom().getPosition().getLocation(rift.getWorld());
+		ll.setDirection(VectorMath.reverseXZ(ll.getDirection()));
+		return ll;
 	}
 
 	public MapColor sampleColor(Location currentLocation)
