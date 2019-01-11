@@ -1,6 +1,6 @@
 package io.shadowrealm.shade.map;
 
-import com.volmit.phantom.plugin.SVC;
+import com.volmit.phantom.api.service.SVC;
 
 import io.shadowrealm.shade.services.LobbySVC;
 

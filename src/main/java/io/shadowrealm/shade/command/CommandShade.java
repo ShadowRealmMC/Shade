@@ -1,8 +1,8 @@
 package io.shadowrealm.shade.command;
 
-import com.volmit.phantom.plugin.PhantomCommand;
-import com.volmit.phantom.plugin.PhantomSender;
-import com.volmit.phantom.plugin.Scaffold.Command;
+import com.volmit.phantom.api.command.PhantomSender;
+import com.volmit.phantom.api.module.Command;
+import com.volmit.phantom.imp.command.PhantomCommand;
 
 import io.shadowrealm.shade.Shade;
 

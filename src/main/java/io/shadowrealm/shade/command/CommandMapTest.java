@@ -1,8 +1,8 @@
 package io.shadowrealm.shade.command;
 
-import com.volmit.phantom.plugin.PhantomCommand;
-import com.volmit.phantom.plugin.PhantomSender;
-import com.volmit.phantom.world.WorldEditor;
+import com.volmit.phantom.api.command.PhantomSender;
+import com.volmit.phantom.imp.command.PhantomCommand;
+import com.volmit.phantom.util.world.WorldEditor;
 
 import io.shadowrealm.shade.Shade;
 import io.shadowrealm.shade.map.ActiveMap;

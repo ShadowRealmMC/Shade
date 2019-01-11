@@ -1,7 +1,7 @@
 package io.shadowrealm.shade.map.config;
 
-import com.volmit.phantom.json.JSONObject;
-import com.volmit.phantom.lang.GList;
+import com.volmit.phantom.api.lang.GList;
+import com.volmit.phantom.api.lang.json.JSONObject;
 
 public class MapConfig
 {

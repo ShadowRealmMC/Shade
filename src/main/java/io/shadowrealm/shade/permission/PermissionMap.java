@@ -1,7 +1,7 @@
 package io.shadowrealm.shade.permission;
 
-import com.volmit.phantom.plugin.PhantomPermission;
-import com.volmit.phantom.plugin.Scaffold.Permission;
+import com.volmit.phantom.api.command.PhantomPermission;
+import com.volmit.phantom.api.module.Permission;
 
 public class PermissionMap extends PhantomPermission
 {

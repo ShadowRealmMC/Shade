@@ -1,6 +1,6 @@
 package io.shadowrealm.shade.map;
 
-import com.volmit.phantom.lang.GMap;
+import com.volmit.phantom.api.lang.GMap;
 
 public class CompiledMap
 {

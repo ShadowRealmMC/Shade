@@ -1,22 +1,19 @@
 package io.shadowrealm.shade;
 
-import com.volmit.phantom.plugin.Module;
-import com.volmit.phantom.plugin.SVC;
-import com.volmit.phantom.plugin.Scaffold.Command;
-import com.volmit.phantom.plugin.Scaffold.Config;
-import com.volmit.phantom.plugin.Scaffold.Instance;
-import com.volmit.phantom.plugin.Scaffold.ModuleInfo;
-import com.volmit.phantom.plugin.Scaffold.Permission;
-import com.volmit.phantom.plugin.Scaffold.Start;
-import com.volmit.phantom.plugin.Scaffold.Stop;
-import com.volmit.phantom.text.C;
+import com.volmit.phantom.api.module.Command;
+import com.volmit.phantom.api.module.Config;
+import com.volmit.phantom.api.module.Instance;
+import com.volmit.phantom.api.module.Module;
+import com.volmit.phantom.api.module.Permission;
+import com.volmit.phantom.api.module.Start;
+import com.volmit.phantom.api.module.Stop;
+import com.volmit.phantom.api.service.SVC;
 
 import io.shadowrealm.shade.command.CommandMap;
 import io.shadowrealm.shade.command.CommandShade;
 import io.shadowrealm.shade.permission.PermissionShade;
 import io.shadowrealm.shade.services.LobbySVC;
 
-@ModuleInfo(name = "Shade", version = "1.0", author = "cyberpwn", color = C.DARK_PURPLE)
 public class Shade extends Module
 {
 	@Config("config")

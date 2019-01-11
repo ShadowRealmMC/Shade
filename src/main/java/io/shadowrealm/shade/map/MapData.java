@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.volmit.phantom.lang.GList;
+import com.volmit.phantom.api.lang.GList;
 
 public class MapData implements Serializable
 {

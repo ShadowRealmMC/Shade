@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.bukkit.Sound;
 
-import com.volmit.phantom.lang.GList;
+import com.volmit.phantom.api.lang.GList;
 
 public enum MapMood implements Serializable
 {

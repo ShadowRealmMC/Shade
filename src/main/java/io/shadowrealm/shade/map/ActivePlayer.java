@@ -21,25 +21,24 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import com.volmit.phantom.plugin.AR;
-import com.volmit.phantom.plugin.PhantomPlugin;
-import com.volmit.phantom.plugin.S;
-import com.volmit.phantom.plugin.SR;
-import com.volmit.phantom.plugin.SVC;
-import com.volmit.phantom.plugin.Scaffold.Async;
-import com.volmit.phantom.services.NMSSVC;
-import com.volmit.phantom.services.ViaVersionSVC;
-import com.volmit.phantom.text.C;
-import com.volmit.phantom.time.M;
-import com.volmit.phantom.util.BlastResistance;
-import com.volmit.phantom.util.ColoredParticleEffect;
-import com.volmit.phantom.util.Cuboid;
-import com.volmit.phantom.util.Cuboid.CuboidDirection;
-import com.volmit.phantom.util.PE;
-import com.volmit.phantom.util.ParticleEffect;
-import com.volmit.phantom.util.Protocol;
-import com.volmit.phantom.util.RecordType;
-import com.volmit.phantom.util.VectorMath;
+import com.volmit.phantom.api.math.M;
+import com.volmit.phantom.api.protocol.Protocol;
+import com.volmit.phantom.api.service.SVC;
+import com.volmit.phantom.api.sheduler.AR;
+import com.volmit.phantom.api.sheduler.S;
+import com.volmit.phantom.api.sheduler.SR;
+import com.volmit.phantom.lib.service.NMSSVC;
+import com.volmit.phantom.lib.service.ViaVersionSVC;
+import com.volmit.phantom.main.PhantomPlugin;
+import com.volmit.phantom.util.sfx.RecordType;
+import com.volmit.phantom.util.text.C;
+import com.volmit.phantom.util.vfx.ColoredParticleEffect;
+import com.volmit.phantom.util.vfx.ParticleEffect;
+import com.volmit.phantom.util.world.BlastResistance;
+import com.volmit.phantom.util.world.Cuboid;
+import com.volmit.phantom.util.world.Cuboid.CuboidDirection;
+import com.volmit.phantom.util.world.PE;
+import com.volmit.phantom.util.world.VectorMath;
 
 import io.shadowrealm.shade.Shade;
 import io.shadowrealm.shade.services.LobbySVC;
@@ -334,7 +333,6 @@ public class ActivePlayer implements Listener
 		}
 	}
 
-	@Async
 	private void tick()
 	{
 		Location currentLocation = player.getLocation().clone().add(player.getLocation().getDirection().clone().multiply(3));

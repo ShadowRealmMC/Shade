@@ -1,15 +1,15 @@
 package io.shadowrealm.shade.command;
 
-import com.volmit.phantom.lang.Callback;
-import com.volmit.phantom.lang.F;
-import com.volmit.phantom.lang.GMap;
-import com.volmit.phantom.lang.Profiler;
-import com.volmit.phantom.plugin.PhantomCommand;
-import com.volmit.phantom.plugin.PhantomSender;
-import com.volmit.phantom.plugin.SVC;
-import com.volmit.phantom.text.C;
-import com.volmit.phantom.util.Cuboid;
-import com.volmit.phantom.world.WorldEditor;
+import com.volmit.phantom.api.command.PhantomSender;
+import com.volmit.phantom.api.lang.Callback;
+import com.volmit.phantom.api.lang.F;
+import com.volmit.phantom.api.lang.GMap;
+import com.volmit.phantom.api.lang.Profiler;
+import com.volmit.phantom.api.service.SVC;
+import com.volmit.phantom.imp.command.PhantomCommand;
+import com.volmit.phantom.util.text.C;
+import com.volmit.phantom.util.world.Cuboid;
+import com.volmit.phantom.util.world.WorldEditor;
 
 import io.shadowrealm.shade.Shade;
 import io.shadowrealm.shade.map.CompiledMap;

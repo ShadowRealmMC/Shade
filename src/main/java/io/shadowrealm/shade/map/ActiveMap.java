@@ -13,24 +13,23 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemMergeEvent;
 
-import com.volmit.phantom.lang.Callback;
-import com.volmit.phantom.lang.D;
-import com.volmit.phantom.lang.GList;
-import com.volmit.phantom.lang.GMap;
-import com.volmit.phantom.plugin.AR;
-import com.volmit.phantom.plugin.PhantomPlugin;
-import com.volmit.phantom.plugin.PhantomSender;
-import com.volmit.phantom.plugin.S;
-import com.volmit.phantom.plugin.SVC;
-import com.volmit.phantom.plugin.Scaffold.Async;
-import com.volmit.phantom.rift.Rift;
-import com.volmit.phantom.rift.RiftException;
-import com.volmit.phantom.services.RiftSVC;
-import com.volmit.phantom.text.C;
-import com.volmit.phantom.time.M;
-import com.volmit.phantom.util.Cuboid;
-import com.volmit.phantom.util.VectorMath;
-import com.volmit.phantom.world.WorldEditor;
+import com.volmit.phantom.api.command.PhantomSender;
+import com.volmit.phantom.api.lang.Callback;
+import com.volmit.phantom.api.lang.D;
+import com.volmit.phantom.api.lang.GList;
+import com.volmit.phantom.api.lang.GMap;
+import com.volmit.phantom.api.math.M;
+import com.volmit.phantom.api.rift.Rift;
+import com.volmit.phantom.api.service.SVC;
+import com.volmit.phantom.api.sheduler.AR;
+import com.volmit.phantom.api.sheduler.S;
+import com.volmit.phantom.imp.rift.RiftException;
+import com.volmit.phantom.lib.service.RiftSVC;
+import com.volmit.phantom.main.PhantomPlugin;
+import com.volmit.phantom.util.text.C;
+import com.volmit.phantom.util.world.Cuboid;
+import com.volmit.phantom.util.world.VectorMath;
+import com.volmit.phantom.util.world.WorldEditor;
 
 import io.shadowrealm.shade.Shade;
 import io.shadowrealm.shade.services.LobbySVC;
@@ -194,7 +193,6 @@ public class ActiveMap implements Listener
 		};
 	}
 
-	@Async
 	private void tick()
 	{
 		try

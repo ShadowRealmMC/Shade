@@ -12,20 +12,20 @@ import org.bukkit.util.Vector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.volmit.phantom.lang.Callback;
-import com.volmit.phantom.lang.F;
-import com.volmit.phantom.lang.GList;
-import com.volmit.phantom.lang.GMap;
-import com.volmit.phantom.lang.Profiler;
-import com.volmit.phantom.plugin.A;
-import com.volmit.phantom.plugin.PhantomSender;
-import com.volmit.phantom.plugin.S;
-import com.volmit.phantom.plugin.SVC;
-import com.volmit.phantom.plugin.SimpleService;
-import com.volmit.phantom.text.C;
-import com.volmit.phantom.time.M;
-import com.volmit.phantom.util.Cuboid;
-import com.volmit.phantom.world.WorldEditor;
+import com.volmit.phantom.api.command.PhantomSender;
+import com.volmit.phantom.api.lang.Callback;
+import com.volmit.phantom.api.lang.F;
+import com.volmit.phantom.api.lang.GList;
+import com.volmit.phantom.api.lang.GMap;
+import com.volmit.phantom.api.lang.Profiler;
+import com.volmit.phantom.api.math.M;
+import com.volmit.phantom.api.service.SVC;
+import com.volmit.phantom.api.service.Service;
+import com.volmit.phantom.api.sheduler.A;
+import com.volmit.phantom.api.sheduler.S;
+import com.volmit.phantom.util.text.C;
+import com.volmit.phantom.util.world.Cuboid;
+import com.volmit.phantom.util.world.WorldEditor;
 
 import io.shadowrealm.shade.map.ColorSpace;
 import io.shadowrealm.shade.map.CompiledMap;
@@ -38,7 +38,7 @@ import io.shadowrealm.shade.map.MapRegion;
 import io.shadowrealm.shade.map.MapSpawn;
 import io.shadowrealm.shade.map.MapWarp;
 
-public class MapBuilderSVC extends SimpleService
+public class MapBuilderSVC extends Service
 {
 	@Override
 	public void onStart()
