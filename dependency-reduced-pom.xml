@@ -6,6 +6,11 @@
   <name>Shade</name>
   <version>1.0</version>
   <description>sdf</description>
+  <developers>
+    <developer>
+      <name>cyberpwn</name>
+    </developer>
+  </developers>
   <build>
     <resources>
       <resource>
@@ -112,7 +117,7 @@
     <dependency>
       <groupId>com.volmit</groupId>
       <artifactId>Phantom</artifactId>
-      <version>3.2.12</version>
+      <version>3.2.13</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

@@ -62,12 +62,12 @@ public class ActivePlayer implements Listener
 	public ActivePlayer(Player player, ActiveMap map)
 	{
 		introLevel = 0;
-		delayEnergy = Shade.config.COMPONENT_LOBBY_ENERGY_REGEN_DELAY;
+		delayEnergy = Shade.config.COMPONENT__LOBBY__ENERGY__REGEN_DELAY;
 		this.player = player;
 		this.map = map;
 		Bukkit.getPluginManager().registerEvents(this, PhantomPlugin.plugin);
-		maxEnergy = Shade.config.COMPONENT_LOBBY_ENERGY_MAX;
-		energy = Shade.config.COMPONENT_LOBBY_ENERGY_START;
+		maxEnergy = Shade.config.COMPONENT__LOBBY__ENERGY__MAX;
+		energy = Shade.config.COMPONENT__LOBBY__ENERGY__START;
 
 		new S()
 		{
@@ -78,7 +78,7 @@ public class ActivePlayer implements Listener
 			}
 		};
 
-		ar = new AR(Shade.config.COMPONENT_LOBBY_SAMPLERATE)
+		ar = new AR(Shade.config.COMPONENT__LOBBY__SAMPLE_RATE)
 		{
 			@Override
 			public void run()
@@ -129,7 +129,7 @@ public class ActivePlayer implements Listener
 	{
 		if(this.energy > energy)
 		{
-			delayEnergy = Shade.config.COMPONENT_LOBBY_ENERGY_REGEN_DELAY;
+			delayEnergy = Shade.config.COMPONENT__LOBBY__ENERGY__REGEN_DELAY;
 			this.energy -= energy;
 			return true;
 		}
@@ -270,7 +270,7 @@ public class ActivePlayer implements Listener
 			player.setVelocity(player.getVelocity().clone().add(player.getLocation().getDirection().clone().multiply(0.074)));
 		}
 
-		if(Shade.config.COMPONENT_LOBBY_BLOCK_DESTRUCTION && player.isGliding())
+		if(Shade.config.COMPONENT__LOBBY__BLOCK_DESTRUCTION && player.isGliding())
 		{
 			Vector d = player.getVelocity();
 			double speed = VectorMath.getSpeed(d);
@@ -329,7 +329,7 @@ public class ActivePlayer implements Listener
 
 		else
 		{
-			energy = M.clip(energy + Shade.config.COMPONENT_LOBBY_ENERGY_REGEN_AMOUNT, 0, maxEnergy);
+			energy = M.clip(energy + Shade.config.COMPONENT__LOBBY__ENERGY__REGEN__AMOUNT, 0, maxEnergy);
 		}
 	}
 

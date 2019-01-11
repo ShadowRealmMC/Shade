@@ -1,5 +1,6 @@
 package io.shadowrealm.shade;
 
+import com.volmit.phantom.api.module.Color;
 import com.volmit.phantom.api.module.Command;
 import com.volmit.phantom.api.module.Config;
 import com.volmit.phantom.api.module.Instance;
@@ -8,12 +9,14 @@ import com.volmit.phantom.api.module.Permission;
 import com.volmit.phantom.api.module.Start;
 import com.volmit.phantom.api.module.Stop;
 import com.volmit.phantom.api.service.SVC;
+import com.volmit.phantom.util.text.C;
 
 import io.shadowrealm.shade.command.CommandMap;
 import io.shadowrealm.shade.command.CommandShade;
 import io.shadowrealm.shade.permission.PermissionShade;
 import io.shadowrealm.shade.services.LobbySVC;
 
+@Color(C.LIGHT_PURPLE)
 public class Shade extends Module
 {
 	@Config("config")
@@ -34,7 +37,7 @@ public class Shade extends Module
 	@Start
 	public void start()
 	{
-		if(config.COMPONENT_LOBBY_ENABLED)
+		if(config.COMPONENT__LOBBY__ENABLED)
 		{
 			l("Enabling Lobby Service");
 			SVC.start(LobbySVC.class);
@@ -44,7 +47,7 @@ public class Shade extends Module
 	@Stop
 	public void stop()
 	{
-		if(config.COMPONENT_LOBBY_ENABLED)
+		if(config.COMPONENT__LOBBY__ENABLED)
 		{
 			SVC.get(LobbySVC.class).close();
 		}
