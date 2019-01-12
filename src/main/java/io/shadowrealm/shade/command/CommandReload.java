@@ -1,7 +1,7 @@
 package io.shadowrealm.shade.command;
 
+import com.volmit.phantom.api.command.PhantomCommand;
 import com.volmit.phantom.api.command.PhantomSender;
-import com.volmit.phantom.imp.command.PhantomCommand;
 
 import io.shadowrealm.shade.Shade;
 

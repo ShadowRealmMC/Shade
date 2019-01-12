@@ -1,12 +1,12 @@
 package io.shadowrealm.shade.command;
 
+import com.volmit.phantom.api.command.PhantomCommand;
 import com.volmit.phantom.api.command.PhantomSender;
 import com.volmit.phantom.api.lang.Callback;
 import com.volmit.phantom.api.lang.F;
 import com.volmit.phantom.api.lang.GMap;
 import com.volmit.phantom.api.lang.Profiler;
 import com.volmit.phantom.api.service.SVC;
-import com.volmit.phantom.imp.command.PhantomCommand;
 import com.volmit.phantom.util.text.C;
 import com.volmit.phantom.util.world.Cuboid;
 import com.volmit.phantom.util.world.WorldEditor;
