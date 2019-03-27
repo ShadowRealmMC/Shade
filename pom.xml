@@ -48,6 +48,9 @@
 						<goals>
 							<goal>shade</goal>
 						</goals>
+						<configuration>
+							<finalName>${project.name}</finalName>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -98,44 +101,30 @@
 		</dependency>
 		<dependency>
 			<groupId>com.volmit</groupId>
-			<artifactId>Phantom</artifactId>
-			<version>3.2.15</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>we</groupId>
-			<artifactId>we</artifactId>
-			<version>1</version>
+			<artifactId>Mortar</artifactId>
+			<version>1.0.43</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.md-5</groupId>
 			<artifactId>bungeecord-api</artifactId>
 			<version>1.12-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.md-5</groupId>
-			<artifactId>bungeecord-api</artifactId>
-			<version>1.12-SNAPSHOT</version>
-			<type>javadoc</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
-			<version>9.4.8.v20171121</version>
+			<version>9.4.11.v20180605</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
-			<version>9.4.8.v20171121</version>
+			<version>9.4.11.v20180605</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-util</artifactId>
-			<version>9.4.8.v20171121</version>
+			<artifactId>jetty-webapp</artifactId>
+			<version>9.4.11.v20180605</version>
 		</dependency>
 	</dependencies>
 </project>

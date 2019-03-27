@@ -1,4 +1,5 @@
-name: Shade
-main: io.shadowrealm.shade.proxy.ShadeBungeecord
-version: 1.0
+name: ${project.name}
+main: io.shadowrealm.shade.proxy.ShadeProxy
+version: ${project.version}
 author: cyberpwn
+depend: [Mortar]
