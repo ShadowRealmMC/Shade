@@ -1,5 +1,4 @@
-package io.shadowrealm.shade.proxy;
-
+package io.shadowrealm.shade.common;
 import java.io.IOException;
 
 import javax.servlet.ServletException;

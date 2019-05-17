@@ -1,5 +1,5 @@
 name: ${project.name}
-main: io.shadowrealm.shade.server.ShadeServer
+main: io.shadowrealm.shade.client.ShadeClient
 version: ${project.version}
 author: cyberpwn
 depend: [Mortar]
