@@ -8,6 +8,9 @@ import org.bukkit.Bukkit;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
+import io.shadowrealm.shade.client.command.CommandChat;
+import io.shadowrealm.shade.client.command.CommandSR;
+import io.shadowrealm.shade.client.permission.PermissionShade;
 import io.shadowrealm.shade.common.CommonProperties;
 import io.shadowrealm.shade.common.RestlessConnector;
 import io.shadowrealm.shade.common.RestlessServlet;
@@ -18,6 +21,8 @@ import io.shadowrealm.shade.common.messages.RKeepAlive;
 import io.shadowrealm.shade.common.messages.RKeptAlive;
 import mortar.api.config.Configurator;
 import mortar.api.sched.J;
+import mortar.bukkit.command.Command;
+import mortar.bukkit.command.Permission;
 import mortar.bukkit.plugin.Control;
 import mortar.bukkit.plugin.Instance;
 import mortar.bukkit.plugin.MortarPlugin;
@@ -35,6 +40,15 @@ public class ShadeClient extends MortarPlugin
 
 	@Instance
 	public static ShadeClient instance;
+
+	@Command("SR")
+	public CommandSR sr;
+
+	@Command("Chat")
+	public CommandChat chat;
+
+	@Permission
+	public static PermissionShade perm;
 
 	@Override
 	public void start()
@@ -111,6 +125,6 @@ public class ShadeClient extends MortarPlugin
 	@Override
 	public String getTag(String subTag)
 	{
-		return TXT.makeTag(C.DARK_GRAY, C.LIGHT_PURPLE, C.GRAY, "Shade");
+		return TXT.makeTag(C.DARK_GRAY, C.LIGHT_PURPLE, C.GRAY, "Shadow");
 	}
 }

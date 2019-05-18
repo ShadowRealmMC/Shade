@@ -13,6 +13,7 @@ import io.shadowrealm.shade.common.messages.RGetAccount;
 import io.shadowrealm.shade.common.messages.RGetCycleData;
 import io.shadowrealm.shade.common.messages.RGetRanks;
 import io.shadowrealm.shade.common.messages.RGiveSXP;
+import io.shadowrealm.shade.common.messages.RLoggedIn;
 import io.shadowrealm.shade.common.messages.RRanks;
 import io.shadowrealm.shade.common.messages.RSXPChanged;
 import io.shadowrealm.shade.common.table.ShadowAccount;
@@ -58,25 +59,6 @@ public class ShadowPlayerController extends Controller
 	}
 
 	@EventHandler
-	public void on(PlayerJoinEvent e)
-	{
-		if(!ShadeClient.ready)
-		{
-			J.s(() -> on(e), 2);
-			return;
-		}
-
-		new RGetAccount().player(e.getPlayer().getUniqueId()).complete(RestlessConnector.instance, (r) ->
-		{
-			if(r instanceof RAccount)
-			{
-				RAccount a = (RAccount) r;
-				join(e.getPlayer(), a.shadowAccount());
-			}
-		});
-	}
-
-	@EventHandler
 	public void on(AsyncPlayerChatEvent e)
 	{
 		if(e.getMessage().equals("r"))
@@ -85,7 +67,7 @@ public class ShadowPlayerController extends Controller
 			e.getPlayer().sendMessage("Current SXP: " + F.f(a.getShadowXP()));
 			e.getPlayer().sendMessage("Earned: " + F.f(a.getShadowXPEarned()));
 			e.getPlayer().sendMessage("Last Earned: " + F.f(a.getShadowXPLastEarned()));
-			e.getPlayer().sendMessage("Rank: " + F.f((a.getShadowXPLastEarned())) + " (" + computeRank(a).getName() + ")");
+			e.getPlayer().sendMessage("Rank: " + F.f((a.getShadowXPLastEarned())) + " (" + computeRank(a).getFullName() + ")");
 		}
 
 		if(e.getMessage().equals("x"))
@@ -101,7 +83,7 @@ public class ShadowPlayerController extends Controller
 					e.getPlayer().sendMessage("Current SXP: " + F.f(a.getShadowXP()));
 					e.getPlayer().sendMessage("Earned: " + F.f(a.getShadowXPEarned()));
 					e.getPlayer().sendMessage("Last Earned: " + F.f(a.getShadowXPLastEarned()));
-					e.getPlayer().sendMessage("Rank: " + F.f((a.getShadowXPLastEarned())) + " (" + computeRank(a).getName() + ")");
+					e.getPlayer().sendMessage("Rank: " + F.f((a.getShadowXPLastEarned())) + " (" + computeRank(a).getFullName() + ")");
 				}
 			});
 		}
@@ -154,6 +136,40 @@ public class ShadowPlayerController extends Controller
 		}
 
 		quit(e.getPlayer());
+	}
+
+	public ShadowAccount getAccount(Player player)
+	{
+		return shadows.get(player);
+	}
+
+	@EventHandler
+	public void on(PlayerJoinEvent e)
+	{
+		if(!ShadeClient.ready)
+		{
+			J.s(() -> on(e), 2);
+			return;
+		}
+
+		//@builder
+		new RLoggedIn()
+		.player(e.getPlayer().getUniqueId())
+		.name(e.getPlayer().getName())
+		.server(ClientConfig.SERVER__ID)
+		.completeBlind(c);
+		new RGetAccount().player(e.getPlayer().getUniqueId()).complete(c, (r) ->
+		{
+			if(r instanceof RAccount)
+			{
+				RAccount a = (RAccount) r;
+				ShadowAccount ac = a.shadowAccount();
+				ac.setCachedName(e.getPlayer().getName());
+				ac.setCachedServer(ClientConfig.SERVER__ID);
+				join(e.getPlayer(), ac);
+			}
+		});
+		//@done
 	}
 
 	private void quit(Player player)

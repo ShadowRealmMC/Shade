@@ -17,6 +17,9 @@ public class ShadowAccount
 	@Column(name = "cached_name", type = "VARCHAR(16)", placeholder = "unknown")
 	private String cachedName;
 
+	@Column(name = "cached_server", type = "VARCHAR(24)", placeholder = "unidentified")
+	private String cachedServer;
+
 	@Column(name = "last_cycle", type = "BIGINT", placeholder = "0")
 	private long lastCycle;
 
@@ -127,5 +130,15 @@ public class ShadowAccount
 	public static TableCache<UUID, ShadowAccount> getCache()
 	{
 		return CACHE;
+	}
+
+	public String getCachedServer()
+	{
+		return cachedServer;
+	}
+
+	public void setCachedServer(String cachedServer)
+	{
+		this.cachedServer = cachedServer;
 	}
 }

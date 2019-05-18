@@ -9,4 +9,6 @@ public interface RestlessCompletable
 	public RestlessObject complete(RestlessConnector c);
 
 	public void complete(RestlessConnector co, Callback<RestlessObject> c);
+
+	public void completeBlind(RestlessConnector co);
 }

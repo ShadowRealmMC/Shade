@@ -70,4 +70,10 @@ public abstract class RestlessObject implements RestlessCompletable
 			}
 		});
 	}
+	
+	@Override
+	public void completeBlind(RestlessConnector co)
+	{
+		complete(co, (r) -> {});
+	}
 }
