@@ -13,12 +13,15 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
 import io.shadowrealm.shade.common.CommonProperties;
+import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessServlet;
 import io.shadowrealm.shade.common.RestlessSide;
 import io.shadowrealm.shade.common.VirtualServer;
 import io.shadowrealm.shade.common.messages.RKeepAlive;
 import io.shadowrealm.shade.common.messages.RKeptAlive;
+import io.shadowrealm.shade.common.messages.RServerStateChanged;
 import mortar.api.config.Configurator;
+import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
@@ -161,5 +164,39 @@ public class ShadeServer extends Plugin implements Listener
 		})
 		, 250, TimeUnit.MILLISECONDS);
 		//@done
+	}
+
+	public GList<ConnectableServer> buildConnectableServers()
+	{
+		GList<ConnectableServer> s = new GList<>();
+
+		for(VirtualServer i : getServerPorts().v())
+		{
+			s.add(new ConnectableServer(i.getName(), i.getId(), i.getStatus(), i.getTagline(), i.getSince(), i.getCount()));
+		}
+
+		return s;
+	}
+
+	public void updateServer(ConnectableServer server)
+	{
+		if(getServerPorts().containsKey(server.getId()))
+		{
+			VirtualServer s = getServerPorts().get(server.getId());
+			s.setCount(server.getOnline());
+			s.setSince(server.getSince());
+			s.setStatus(server.getStatus());
+			s.setTagline(server.getTagline());
+
+			for(String i : serverPorts.k())
+			{
+				if(i.equals(server.getId()))
+				{
+					continue;
+				}
+
+				new RServerStateChanged().server(server).completeBlind(serverPorts.get(i).getConnector());
+			}
+		}
 	}
 }
