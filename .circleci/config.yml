@@ -8,9 +8,11 @@ jobs:
       - checkout
       - restore_cache:
           key: circleci-project-{{ checksum "pom.xml" }}
-      - run: mvn dependency:go-offline
+      - run: mvn dependency:go-offline -Pci
       - save_cache:
           paths:
             - ~/.m2
           key: circleci-project-{{ checksum "pom.xml" }}
-      - run: mvn package
+      - run: mvn package -Pci
+      - store_artifacts:
+          path: target/Shade-production.jar
