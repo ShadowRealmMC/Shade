@@ -6,6 +6,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessConnector;
 import io.shadowrealm.shade.common.messages.RAccount;
 import io.shadowrealm.shade.common.messages.RCycleData;
@@ -16,10 +17,13 @@ import io.shadowrealm.shade.common.messages.RGiveSXP;
 import io.shadowrealm.shade.common.messages.RLoggedIn;
 import io.shadowrealm.shade.common.messages.RRanks;
 import io.shadowrealm.shade.common.messages.RSXPChanged;
+import io.shadowrealm.shade.common.messages.RStateChanged;
 import io.shadowrealm.shade.common.table.ShadowAccount;
 import io.shadowrealm.shade.common.table.ShadowRank;
 import mortar.api.sched.J;
+import mortar.api.world.P;
 import mortar.bukkit.plugin.Controller;
+import mortar.compute.math.M;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
@@ -30,6 +34,10 @@ public class ShadowPlayerController extends Controller
 	private GMap<Player, ShadowAccount> shadows;
 	private GList<ShadowRank> ranks;
 	private long cycleInterval;
+	private ConnectableServer lastState;
+	private String status;
+	private String tagline;
+	private long since;
 
 	@Override
 	public void start()
@@ -40,10 +48,27 @@ public class ShadowPlayerController extends Controller
 			return;
 		}
 
+		tagline = "";
+		status = "&dOnline";
+		since = M.ms();
+		lastState = new ConnectableServer(ClientConfig.SERVER__NAME, ClientConfig.SERVER__ID, status, tagline, since, P.onlinePlayers().size());
 		shadows = new GMap<>();
 		c = RestlessConnector.instance;
 		new RGetRanks().complete(c, (r) -> ranks = new GList<>(((RRanks) r).ranks()));
 		new RGetCycleData().complete(c, (r) -> cycleInterval = ((RCycleData) r).cycle());
+		J.ar(() -> updateState(), 20 * 2);
+	}
+
+	private void updateState()
+	{
+		if(!tagline.equals(lastState.getTagline()) || !status.equals(lastState.getStatus()) || since != lastState.getSince() || P.onlinePlayers().size() != lastState.getOnline())
+		{
+			lastState.setTagline(tagline);
+			lastState.setStatus(status);
+			lastState.setSince(since);
+			lastState.setOnline(P.onlinePlayers().size());
+			new RStateChanged().completeBlind(c);
+		}
 	}
 
 	@Override
