@@ -122,6 +122,11 @@ public class ShadeClient extends MortarPlugin
 
 	}
 
+	public RestlessConnector getConnector()
+	{
+		return c;
+	}
+
 	@Override
 	public String getTag(String subTag)
 	{
