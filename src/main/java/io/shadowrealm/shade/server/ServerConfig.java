@@ -1,5 +1,7 @@
 package io.shadowrealm.shade.server;
 
+import mortar.lang.collection.GList;
+
 public class ServerConfig
 {
 	public static long RANKING__CYCLE_TIME__VALUE = 1;
@@ -16,4 +18,5 @@ public class ServerConfig
 	public static String DATABASE__PASSWORD = ".";
 	public static String DATABASE__ADDRESS = "localhost";
 	public static String DATABASE__TABLE_PREFIX = "shade_";
+	public static GList<String> PORT_OVERRIDES = new GList<String>().qadd("serverid=15752");
 }
