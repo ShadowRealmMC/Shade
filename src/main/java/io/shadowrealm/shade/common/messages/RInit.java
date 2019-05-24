@@ -19,6 +19,25 @@ public class RInit extends RestlessObject
 		int max = ServerConfig.WEBSERVER__CLIENT_PORT_POOL__MAX;
 		GMap<String, VirtualServer> ports = ShadeServer.instance.getServerPorts();
 
+		for(String i : ServerConfig.PORT_OVERRIDES)
+		{
+			String s = i.split("\\Q=\\E")[0];
+			int p = Integer.valueOf(i.split("\\Q=\\E")[1]);
+
+			if(serverID().equals(s))
+			{
+				ports.put(serverID, new VirtualServer(serverID(), serverName(), route(), p));
+				ShadeServer.instance.initialized(serverID);
+
+				if(!ports.containsKey(serverID))
+				{
+					return new RError().message("Could not find an open port. Surry, but Furk U");
+				}
+
+				return new RInitialized().port(ports.get(serverID).getPort());
+			}
+		}
+
 		searching: for(int i = min; i < max; i++)
 		{
 			for(VirtualServer j : ports.v())
@@ -28,7 +47,6 @@ public class RInit extends RestlessObject
 					continue searching;
 				}
 			}
-
 			ports.put(serverID, new VirtualServer(serverID(), serverName(), route(), i));
 			ShadeServer.instance.initialized(serverID);
 			break;
