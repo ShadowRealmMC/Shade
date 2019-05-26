@@ -180,6 +180,11 @@ public class ShadeServer extends Plugin implements Listener
 
 	public void updateServer(ConnectableServer server)
 	{
+		if(server == null)
+		{
+			return;
+		}
+
 		if(getServerPorts().containsKey(server.getId()))
 		{
 			VirtualServer s = getServerPorts().get(server.getId());
