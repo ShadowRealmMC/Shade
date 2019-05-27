@@ -59,6 +59,7 @@
 						</goals>
 						<configuration>
 							<finalName>${project.name}</finalName>
+							<shadedArtifactAttached>true</shadedArtifactAttached>
 						</configuration>
 					</execution>
 				</executions>
@@ -79,7 +80,7 @@
 				<configuration>
 					<skip>${skip.copy}</skip>
 					<executable>${project.basedir}/scripts/dev.bat</executable>
-					<arguments>${project.basedir}\target\Shade.jar</arguments>
+					<arguments>${project.basedir}\target\Shade-production-shaded.jar</arguments>
 				</configuration>
 			</plugin>
 		</plugins>
