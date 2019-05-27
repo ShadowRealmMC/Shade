@@ -101,6 +101,10 @@
 			<id>bungeecord-repo</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</repository>
+		<repository>
+			<id>shadowrealm</id>
+			<url>http://nexus.volmit.com/content/repositories/shadowrealm</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -142,4 +146,10 @@
 			<version>2.7.5</version>
 		</dependency>
 	</dependencies>
+	<distributionManagement>
+		<repository>
+			<id>shadowrealm</id>
+			<url>http://nexus.volmit.com/content/repositories/shadowrealm</url>
+		</repository>
+	</distributionManagement>
 </project>
