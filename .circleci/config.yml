@@ -13,6 +13,6 @@ jobs:
           paths:
             - ~/.m2
           key: circleci-project-{{ checksum "pom.xml" }}
-      - run: mvn package -Pci
+      - run: mvn deploy -Pci
       - store_artifacts:
           path: target/Shade-production.jar
