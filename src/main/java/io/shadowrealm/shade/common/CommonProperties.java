@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import com.squareup.okhttp.OkHttpClient;
@@ -22,14 +20,20 @@ public class CommonProperties
 
 	public static void downloadUpdates()
 	{
-		l("Preparing to download");
-		ExecutorService svc = Executors.newCachedThreadPool();
+		l("Preparing Updates...");
 
 		if(DOWNLOAD.isEmpty())
 		{
-			l("Nothing to download.");
+			l("Nothing to update.");
 			return;
 		}
+
+		l("Downloading " + DOWNLOAD.size() + " Update(s)");
+
+		OkHttpClient cu = new OkHttpClient();
+		cu.setConnectTimeout(10, TimeUnit.SECONDS);
+		cu.setReadTimeout(10, TimeUnit.SECONDS);
+		cu.setWriteTimeout(10, TimeUnit.SECONDS);
 
 		OkHttpClient c = new OkHttpClient();
 		c.setConnectTimeout(10, TimeUnit.SECONDS);
@@ -39,44 +43,30 @@ public class CommonProperties
 
 		for(String i : DOWNLOAD)
 		{
-			svc.submit(new Runnable()
+			try
 			{
-				@Override
-				public void run()
+				URL u = new URL(i.split("=")[1]);
+				File f = new File("plugins/update", i.split("=")[0] + ".jar");
+				f.getParentFile().mkdirs();
+				OkHttpClient x = i.split("=")[1].contains("shadowrealm") ? c : cu;
+				Response r = x.newCall(new Request.Builder().url(u).build()).execute();
+				if(!r.isSuccessful())
 				{
-					try
-					{
-						URL u = new URL(i.split("=")[1]);
-						File f = new File("plugins/update", i.split("=")[0] + ".jar");
-						f.getParentFile().mkdirs();
-						Response r = c.newCall(new Request.Builder().url(u).build()).execute();
-						if(!r.isSuccessful())
-						{
-							throw new IOException("Failed to download file: " + r);
-						}
-						FileOutputStream fos = new FileOutputStream(f);
-						fos.write(r.body().bytes());
-						fos.close();
-					}
-
-					catch(Throwable e)
-					{
-
-					}
+					throw new IOException("Failed to download file: " + r);
 				}
-			});
+				FileOutputStream fos = new FileOutputStream(f);
+				fos.write(r.body().bytes());
+				fos.close();
+				l("Updated " + i.split("=")[0] + ".jar");
+			}
+
+			catch(Throwable e)
+			{
+				e.printStackTrace();
+			}
 		}
 
-		svc.shutdown();
-		try
-		{
-			svc.awaitTermination(5, TimeUnit.MINUTES);
-		}
-
-		catch(InterruptedException e)
-		{
-			e.printStackTrace();
-		}
+		l("Updates Complete");
 	}
 
 	public static void l(String f)
