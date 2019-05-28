@@ -41,7 +41,7 @@ public class ShadeServer extends Plugin implements Listener
 	{
 		instance = this;
 		serverPorts = new GMap<>();
-		Configurator.JSON.load(ServerConfig.class, new File(getDataFolder(), "config.json"));
+		Configurator.DEFAULT.load(ServerConfig.class, new File(getDataFolder(), "config.json"));
 		CommonProperties.DEBUG_CONNECTION = ServerConfig.WEBSERVER__CONNECTION_DEBUGGING;
 		CommonProperties.SIDE = RestlessSide.SERVER;
 		CommonProperties.DOWNLOAD = ServerConfig.UPDATE;
