@@ -46,7 +46,7 @@ public class CommonProperties
 			try
 			{
 				URL u = new URL(i.split("=")[1]);
-				File f = new File("plugins/update", i.split("=")[0] + ".jar");
+				File f = new File("plugins" + (SIDE.equals(RestlessSide.CLIENT) ? "/update" : ""), i.split("=")[0] + ".jar");
 				f.getParentFile().mkdirs();
 				OkHttpClient x = i.split("=")[1].contains("shadowrealm") ? c : cu;
 				Response r = x.newCall(new Request.Builder().url(u).build()).execute();
