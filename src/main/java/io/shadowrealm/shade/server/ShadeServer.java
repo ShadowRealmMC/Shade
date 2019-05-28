@@ -12,7 +12,6 @@ import javax.servlet.Servlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
-import io.shadowrealm.shade.client.ClientConfig;
 import io.shadowrealm.shade.common.CommonProperties;
 import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessServlet;
@@ -45,7 +44,7 @@ public class ShadeServer extends Plugin implements Listener
 		Configurator.JSON.load(ServerConfig.class, new File(getDataFolder(), "config.json"));
 		CommonProperties.DEBUG_CONNECTION = ServerConfig.WEBSERVER__CONNECTION_DEBUGGING;
 		CommonProperties.SIDE = RestlessSide.SERVER;
-		CommonProperties.DOWNLOAD = ClientConfig.UPDATE;
+		CommonProperties.DOWNLOAD = ServerConfig.UPDATE;
 		server = new Server(ServerConfig.WEBSERVER__SERVER_PORT);
 		ServletContextHandler api = new ServletContextHandler(server, "/");
 		getLogger().info("Init Web Server");
