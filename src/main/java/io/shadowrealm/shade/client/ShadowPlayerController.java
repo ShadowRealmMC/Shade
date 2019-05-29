@@ -67,6 +67,7 @@ public class ShadowPlayerController extends Controller
 	private void updateState()
 	{
 		online = P.onlinePlayers().size();
+		Shade.updateServer(lastState);
 
 		if(latch.flip() || online != lastState.getOnline() || !tagline.equals(lastState.getTagline()) || !status.equals(lastState.getStatus()) || since != lastState.getSince() || P.onlinePlayers().size() != lastState.getOnline())
 		{
