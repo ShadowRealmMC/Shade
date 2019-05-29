@@ -41,7 +41,7 @@ public class ShadeServer extends Plugin implements Listener
 	{
 		instance = this;
 		serverPorts = new GMap<>();
-		Configurator.DEFAULT.load(ServerConfig.class, new File(getDataFolder(), "config.json"));
+		Configurator.DEFAULT.load(ServerConfig.class, new File(getDataFolder(), "config.yml"));
 		CommonProperties.DEBUG_CONNECTION = ServerConfig.WEBSERVER__CONNECTION_DEBUGGING;
 		CommonProperties.SIDE = RestlessSide.SERVER;
 		CommonProperties.DOWNLOAD = ServerConfig.UPDATE;
@@ -54,8 +54,6 @@ public class ShadeServer extends Plugin implements Listener
 		getLogger().info("Registering API Servlet @/" + rl.getNode());
 		api.addServlet((Class<? extends Servlet>) rl.getClass(), "/" + rl.getNode());
 		getLogger().info("Processing Configuration");
-		File f = new File(getDataFolder(), "config.json");
-		Configurator.JSON.load(ServerConfig.class, f);
 		getLogger().info("Connecting to MySQL jdbc:mysql://" + ServerConfig.DATABASE__ADDRESS + "/" + ServerConfig.DATABASE__NAME + "?username=" + ServerConfig.DATABASE__USER + "&password=" + F.repeat("*", ServerConfig.DATABASE__PASSWORD.length()));
 		Connection sql = null;
 		try
