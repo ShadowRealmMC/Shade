@@ -117,7 +117,7 @@
 		<dependency>
 			<groupId>com.volmit</groupId>
 			<artifactId>Mortar</artifactId>
-			<version>1.0.56</version>
+			<version>1.0.61</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
