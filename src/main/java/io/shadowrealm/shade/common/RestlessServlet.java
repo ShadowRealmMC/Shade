@@ -47,7 +47,7 @@ public class RestlessServlet extends ShadowServlet
 							System.out.println("[INTERCOM]: " + who + " -> " + w + " (" + "null" + ")");
 						}
 
-						write(resp, "");
+						write(resp, "\n");
 					}
 
 					else
