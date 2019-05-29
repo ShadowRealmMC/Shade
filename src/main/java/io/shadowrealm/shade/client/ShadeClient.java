@@ -38,6 +38,9 @@ public class ShadeClient extends MortarPlugin
 	@Control
 	public ShadowPlayerController shadowPlayerController;
 
+	@Control
+	public ShadowServerController shadowServerController;
+
 	@Instance
 	public static ShadeClient instance;
 
