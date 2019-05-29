@@ -36,8 +36,8 @@ public class CommonProperties
 
 		l("Downloading " + DOWNLOAD.size() + " Update(s)");
 
-		OkHttpClient cu = new OkHttpClient().newBuilder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).build();
-		OkHttpClient c = new OkHttpClient().newBuilder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).addInterceptor(new BasicAuthInterceptor("admin", "12311232")).build();
+		OkHttpClient cu = new OkHttpClient().newBuilder().retryOnConnectionFailure(true).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).build();
+		OkHttpClient c = new OkHttpClient().newBuilder().retryOnConnectionFailure(true).connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).addInterceptor(new BasicAuthInterceptor("admin", "12311232")).build();
 
 		for(String i : DOWNLOAD)
 		{

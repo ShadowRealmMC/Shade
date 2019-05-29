@@ -29,7 +29,7 @@ public class RestlessConnector
 		this.address = address;
 		this.port = port;
 
-		c = new OkHttpClient().newBuilder().writeTimeout(5, TimeUnit.SECONDS).readTimeout(5, TimeUnit.SECONDS).connectTimeout(5, TimeUnit.SECONDS).build();
+		c = new OkHttpClient().newBuilder().retryOnConnectionFailure(true).writeTimeout(5, TimeUnit.SECONDS).readTimeout(5, TimeUnit.SECONDS).connectTimeout(5, TimeUnit.SECONDS).build();
 		service = Executors.newWorkStealingPool(4);
 		this.who = who;
 	}
