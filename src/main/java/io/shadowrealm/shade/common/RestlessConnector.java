@@ -56,7 +56,7 @@ public class RestlessConnector
 
 	public JSONObject request(JSONObject request) throws JSONException, IOException
 	{
-		Response r = c.newCall(new Request.Builder().url("http://" + address + ":" + port + "/wire?j=" + encode(request.toString(0))).build()).execute();
+		Response r = c.newCall(new Request.Builder().header("Connection", "close").url("http://" + address + ":" + port + "/wire?j=" + encode(request.toString(0))).build()).execute();
 		String x = r.body().string();
 
 		if(x.isEmpty())
