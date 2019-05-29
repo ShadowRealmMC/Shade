@@ -7,12 +7,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-
 import mortar.lang.json.JSONException;
 import mortar.lang.json.JSONObject;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class RestlessConnector
 {
@@ -29,10 +28,8 @@ public class RestlessConnector
 		instance = this;
 		this.address = address;
 		this.port = port;
-		c = new OkHttpClient();
-		c.setWriteTimeout(5, TimeUnit.SECONDS);
-		c.setReadTimeout(5, TimeUnit.SECONDS);
-		c.setConnectTimeout(5, TimeUnit.SECONDS);
+
+		c = new OkHttpClient().newBuilder().writeTimeout(5, TimeUnit.SECONDS).readTimeout(5, TimeUnit.SECONDS).connectTimeout(5, TimeUnit.SECONDS).build();
 		service = Executors.newWorkStealingPool(4);
 		this.who = who;
 	}

@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-
 import mortar.lang.collection.GList;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class CommonProperties
 {
@@ -37,16 +36,8 @@ public class CommonProperties
 
 		l("Downloading " + DOWNLOAD.size() + " Update(s)");
 
-		OkHttpClient cu = new OkHttpClient();
-		cu.setConnectTimeout(10, TimeUnit.SECONDS);
-		cu.setReadTimeout(10, TimeUnit.SECONDS);
-		cu.setWriteTimeout(10, TimeUnit.SECONDS);
-
-		OkHttpClient c = new OkHttpClient();
-		c.setConnectTimeout(10, TimeUnit.SECONDS);
-		c.setReadTimeout(10, TimeUnit.SECONDS);
-		c.setWriteTimeout(10, TimeUnit.SECONDS);
-		c.interceptors().add(new BasicAuthInterceptor("admin", "12311232"));
+		OkHttpClient cu = new OkHttpClient().newBuilder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).build();
+		OkHttpClient c = new OkHttpClient().newBuilder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).addInterceptor(new BasicAuthInterceptor("admin", "12311232")).build();
 
 		for(String i : DOWNLOAD)
 		{
