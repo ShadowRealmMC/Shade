@@ -37,19 +37,14 @@ public class ShadowAccount
 
 	public ShadowAccount()
 	{
-		id = UUID.randomUUID();
-		this.cachedName = "unknown";
-		this.shadowXP = 0;
-		this.shadowXPEarned = 0;
-		this.shadowXPLastEarned = 0;
-		this.amethyst = 0;
-		this.lastCycle = 0;
+		this(UUID.randomUUID());
 	}
 
 	public ShadowAccount(UUID id)
 	{
 		this.id = id;
 		this.cachedName = "unknown";
+		this.cachedServer = "unknown";
 		this.shadowXP = 0;
 		this.shadowXPEarned = 0;
 		this.shadowXPLastEarned = 0;
