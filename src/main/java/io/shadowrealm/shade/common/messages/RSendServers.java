@@ -1,5 +1,8 @@
 package io.shadowrealm.shade.common.messages;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessObject;
 import mortar.api.sql.UniversalType;
@@ -8,7 +11,12 @@ import mortar.lang.collection.GList;
 public class RSendServers extends RestlessObject
 {
 	@UniversalType(ConnectableServer.class)
-	private GList<ConnectableServer> servers = new GList<>();
+	private List<ConnectableServer> servers;
+
+	public RSendServers()
+	{
+		servers = new ArrayList<>();
+	}
 
 	@Override
 	public RestlessObject handle()
@@ -22,7 +30,7 @@ public class RSendServers extends RestlessObject
 		return this;
 	}
 
-	public GList<ConnectableServer> servers()
+	public List<ConnectableServer> servers()
 	{
 		return servers;
 	}
