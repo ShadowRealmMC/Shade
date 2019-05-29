@@ -30,7 +30,6 @@ import mortar.logic.format.F;
 
 public class ShadowPlayerController extends Controller
 {
-	private RestlessConnector c;
 	private GMap<Player, ShadowAccount> shadows;
 	private GList<ShadowRank> ranks;
 	private long cycleInterval;
@@ -53,9 +52,8 @@ public class ShadowPlayerController extends Controller
 		since = M.ms();
 		lastState = new ConnectableServer(ClientConfig.SERVER__NAME, ClientConfig.SERVER__ID, status, tagline, since, P.onlinePlayers().size());
 		shadows = new GMap<>();
-		c = RestlessConnector.instance;
-		new RGetRanks().complete(c, (r) -> ranks = new GList<>(((RRanks) r).ranks()));
-		new RGetCycleData().complete(c, (r) -> cycleInterval = ((RCycleData) r).cycle());
+		new RGetRanks().complete(ShadeClient.instance.getConnector(), (r) -> ranks = new GList<>(((RRanks) r).ranks()));
+		new RGetCycleData().complete(ShadeClient.instance.getConnector(), (r) -> cycleInterval = ((RCycleData) r).cycle());
 		J.ar(() -> updateState(), 20 * 2);
 	}
 
@@ -67,7 +65,7 @@ public class ShadowPlayerController extends Controller
 			lastState.setStatus(status);
 			lastState.setSince(since);
 			lastState.setOnline(P.onlinePlayers().size());
-			new RStateChanged().completeBlind(c);
+			new RStateChanged().completeBlind(ShadeClient.instance.getConnector());
 		}
 	}
 
@@ -98,7 +96,7 @@ public class ShadowPlayerController extends Controller
 		if(e.getMessage().equals("x"))
 		{
 			ShadowAccount a = shadows.get(e.getPlayer());
-			new RGiveSXP().player(a.getId()).amount(500).complete(c, (rx) ->
+			new RGiveSXP().player(a.getId()).amount(500).complete(ShadeClient.instance.getConnector(), (rx) ->
 			{
 				if(rx instanceof RSXPChanged)
 				{
@@ -182,8 +180,8 @@ public class ShadowPlayerController extends Controller
 		.player(e.getPlayer().getUniqueId())
 		.name(e.getPlayer().getName())
 		.server(ClientConfig.SERVER__ID)
-		.completeBlind(c);
-		new RGetAccount().player(e.getPlayer().getUniqueId()).complete(c, (r) ->
+		.completeBlind(ShadeClient.instance.getConnector());
+		new RGetAccount().player(e.getPlayer().getUniqueId()).complete(ShadeClient.instance.getConnector(), (r) ->
 		{
 			if(r instanceof RAccount)
 			{
@@ -210,7 +208,7 @@ public class ShadowPlayerController extends Controller
 
 	public RestlessConnector getC()
 	{
-		return c;
+		return ShadeClient.instance.getConnector();
 	}
 
 	public GMap<Player, ShadowAccount> getShadows()
