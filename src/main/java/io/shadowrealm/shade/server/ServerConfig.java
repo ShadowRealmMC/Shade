@@ -19,5 +19,6 @@ public class ServerConfig
 	public static String DATABASE__ADDRESS = "localhost";
 	public static String DATABASE__TABLE_PREFIX = "shade_";
 	public static GList<String> PORT_OVERRIDES = new GList<String>().qadd("serverid=15752");
+	public static boolean DOWNLOAD_UPDATES = true;
 	public static GList<String> UPDATE = new GList<String>().qadd("Shade=http://nexus.volmit.com/content/repositories/shadowrealm/io/shadowrealm/Shade/production/Shade-production-shaded.jar");
 }

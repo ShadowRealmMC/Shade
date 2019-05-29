@@ -17,9 +17,16 @@ public class CommonProperties
 	public static boolean DEBUG_CONNECTION = false;
 	public static RestlessSide SIDE;
 	public static GList<String> DOWNLOAD = new GList<String>();
+	public static boolean DOWNLOAD_UPDATES = true;
 
 	public static void downloadUpdates()
 	{
+		if(!DOWNLOAD_UPDATES)
+		{
+			l("Not downloading updates");
+			return;
+		}
+
 		l("Preparing Updates...");
 
 		if(DOWNLOAD.isEmpty())

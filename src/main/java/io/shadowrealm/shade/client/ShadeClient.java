@@ -60,6 +60,7 @@ public class ShadeClient extends MortarPlugin
 		CommonProperties.DEBUG_CONNECTION = ClientConfig.WEBSERVER__CONNECTION_DEBUGGING;
 		CommonProperties.SIDE = RestlessSide.CLIENT;
 		CommonProperties.DOWNLOAD = ClientConfig.UPDATE;
+		CommonProperties.DOWNLOAD_UPDATES = ClientConfig.DOWNLOAD_UPDATES;
 		RestlessServlet.who = ClientConfig.SERVER__ID;
 		l("Establishing connection with proxy " + ClientConfig.WEBSERVER__SERVER_ADDRESS + ":" + ClientConfig.WEBSERVER__SERVER_PORT);
 		c = new RestlessConnector(ClientConfig.WEBSERVER__SERVER_ADDRESS, ClientConfig.WEBSERVER__SERVER_PORT, "proxy");

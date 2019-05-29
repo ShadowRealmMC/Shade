@@ -45,6 +45,7 @@ public class ShadeServer extends Plugin implements Listener
 		CommonProperties.DEBUG_CONNECTION = ServerConfig.WEBSERVER__CONNECTION_DEBUGGING;
 		CommonProperties.SIDE = RestlessSide.SERVER;
 		CommonProperties.DOWNLOAD = ServerConfig.UPDATE;
+		CommonProperties.DOWNLOAD_UPDATES = ServerConfig.DOWNLOAD_UPDATES;
 		server = new Server(ServerConfig.WEBSERVER__SERVER_PORT);
 		ServletContextHandler api = new ServletContextHandler(server, "/");
 		getLogger().info("Init Web Server");
