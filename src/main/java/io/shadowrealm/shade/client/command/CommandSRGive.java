@@ -19,5 +19,4 @@ public class CommandSRGive extends MortarCommand
 
 		return true;
 	}
-
 }

@@ -54,7 +54,6 @@ public class ShadeClient extends MortarPlugin
 	public void start()
 	{
 		ready = false;
-		//@builder
 		l("Loading Configuration");
 		Configurator.BUKKIT.load(ClientConfig.class, new File(getDataFolder(), "config.yml"));
 		CommonProperties.DEBUG_CONNECTION = ClientConfig.WEBSERVER__CONNECTION_DEBUGGING;
@@ -62,6 +61,12 @@ public class ShadeClient extends MortarPlugin
 		CommonProperties.DOWNLOAD = ClientConfig.UPDATE;
 		CommonProperties.DOWNLOAD_UPDATES = ClientConfig.DOWNLOAD_UPDATES;
 		RestlessServlet.who = ClientConfig.SERVER__ID;
+		establishConnection();
+	}
+
+	public void establishConnection()
+	{
+		//@builder
 		l("Establishing connection with proxy " + ClientConfig.WEBSERVER__SERVER_ADDRESS + ":" + ClientConfig.WEBSERVER__SERVER_PORT);
 		c = new RestlessConnector(ClientConfig.WEBSERVER__SERVER_ADDRESS, ClientConfig.WEBSERVER__SERVER_PORT, "proxy");
 		l("Initializing with Proxy as " + ClientConfig.SERVER__ID + " (" + ClientConfig.SERVER__NAME + ")");
