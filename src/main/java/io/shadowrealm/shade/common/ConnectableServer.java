@@ -21,6 +21,12 @@ public class ConnectableServer
 
 	public ConnectableServer()
 	{
+		name = "";
+		id = "";
+		status = "";
+		tagline = "";
+		since = -1;
+		online = -1;
 	}
 
 	public String getName()
