@@ -1,22 +1,18 @@
 package io.shadowrealm.shade.client;
 
+import java.util.List;
+
 import io.shadowrealm.shade.common.ConnectableServer;
-import io.shadowrealm.shade.common.RestlessConnector;
 import io.shadowrealm.shade.common.RestlessObject;
 import io.shadowrealm.shade.common.messages.RGetServers;
-import io.shadowrealm.shade.common.messages.RKeepAlive;
-import io.shadowrealm.shade.common.messages.RKeptAlive;
 import io.shadowrealm.shade.common.messages.RSendServers;
 import mortar.api.sched.J;
 import mortar.bukkit.plugin.Controller;
 import mortar.compute.math.M;
-import mortar.lang.collection.GList;
 import mortar.util.text.D;
 
 public class ShadowServerController extends Controller
 {
-	private RestlessConnector c;
-
 	@Override
 	public void start()
 	{
@@ -26,20 +22,21 @@ public class ShadowServerController extends Controller
 			return;
 		}
 
-		c = ShadeClient.instance.getConnector();
-		J.ar(() -> new RGetServers().complete(c, (r) -> ingestServers(r)), 20 * 60);
 		J.ar(() ->
 		{
 			boolean failed = false;
 
 			try
 			{
-				RKeptAlive a = (RKeptAlive) new RKeepAlive().complete(c);
+				RSendServers r = (RSendServers) new RGetServers().complete(ShadeClient.instance.getConnector());
 
-				if(a == null)
+				if(r == null)
 				{
 					failed = true;
+					return;
 				}
+
+				ingestServers(r);
 			}
 
 			catch(Throwable e)
@@ -52,14 +49,14 @@ public class ShadowServerController extends Controller
 				D.as("ShadowServerController").f("Failed to connect to proxy. Attempting to reconnect...");
 				J.s(() -> ShadeClient.instance.establishConnection());
 			}
-		}, 20 * M.rand(30, 60));
+		}, 20 * M.rand(20, 60));
 	}
 
 	private void ingestServers(RestlessObject r)
 	{
 		if(r instanceof RSendServers)
 		{
-			GList<ConnectableServer> s = ((RSendServers) r).servers();
+			List<ConnectableServer> s = ((RSendServers) r).servers();
 
 			for(ConnectableServer i : s)
 			{
