@@ -27,6 +27,7 @@ import mortar.compute.math.M;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
+import mortar.logic.queue.ChronoLatch;
 
 public class ShadowPlayerController extends Controller
 {
@@ -37,6 +38,8 @@ public class ShadowPlayerController extends Controller
 	private String status;
 	private String tagline;
 	private long since;
+	private int online;
+	private ChronoLatch latch;
 
 	@Override
 	public void start()
@@ -47,32 +50,41 @@ public class ShadowPlayerController extends Controller
 			return;
 		}
 
+		latch = new ChronoLatch(10000);
+		online = 0;
 		tagline = "";
-		status = "&dOnline";
+		status = "&eSyncronizing...";
 		since = M.ms();
 		lastState = new ConnectableServer(ClientConfig.SERVER__NAME, ClientConfig.SERVER__ID, status, tagline, since, P.onlinePlayers().size());
 		shadows = new GMap<>();
 		new RGetRanks().complete(ShadeClient.instance.getConnector(), (r) -> ranks = new GList<>(((RRanks) r).ranks()));
 		new RGetCycleData().complete(ShadeClient.instance.getConnector(), (r) -> cycleInterval = ((RCycleData) r).cycle());
 		J.ar(() -> updateState(), 20 * 2);
+		J.s(() -> status = "&aOnline", 100);
+		J.s(() -> since = M.ms(), 100);
 	}
 
 	private void updateState()
 	{
-		if(!tagline.equals(lastState.getTagline()) || !status.equals(lastState.getStatus()) || since != lastState.getSince() || P.onlinePlayers().size() != lastState.getOnline())
+		online = P.onlinePlayers().size();
+
+		if(latch.flip() || online != lastState.getOnline() || !tagline.equals(lastState.getTagline()) || !status.equals(lastState.getStatus()) || since != lastState.getSince() || P.onlinePlayers().size() != lastState.getOnline())
 		{
 			lastState.setTagline(tagline);
 			lastState.setStatus(status);
 			lastState.setSince(since);
-			lastState.setOnline(P.onlinePlayers().size());
-			new RStateChanged().completeBlind(ShadeClient.instance.getConnector());
+			lastState.setOnline(online);
+			new RStateChanged().server(lastState).completeBlind(ShadeClient.instance.getConnector());
 		}
 	}
 
 	@Override
 	public void stop()
 	{
-
+		lastState.setStatus("&cRestarting");
+		lastState.setSince(M.ms());
+		lastState.setOnline(0);
+		new RStateChanged().server(lastState).complete(ShadeClient.instance.getConnector());
 	}
 
 	@Override
@@ -159,6 +171,7 @@ public class ShadowPlayerController extends Controller
 		}
 
 		quit(e.getPlayer());
+
 	}
 
 	public ShadowAccount getAccount(Player player)
