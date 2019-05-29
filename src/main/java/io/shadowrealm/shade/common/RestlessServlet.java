@@ -60,7 +60,7 @@ public class RestlessServlet extends ShadowServlet
 						JSONObject x = UniversalParser.toJSON(r);
 						x.put("sr-type", r.getClass().getCanonicalName());
 						x.put("sr-who", who);
-						write(resp, x.toString(0));
+						write(resp, x.toString(0) + "\n");
 					}
 				}
 
@@ -78,7 +78,7 @@ public class RestlessServlet extends ShadowServlet
 						JSONObject x = UniversalParser.toJSON(new RError("Exception thrown while handling response. " + e.getMessage() + " (" + e.getClass().getSimpleName() + ")"));
 						x.put("sr-type", RError.class.getCanonicalName());
 						x.put("sr-who", who);
-						write(resp, x.toString(0));
+						write(resp, x.toString(0) + "\n");
 					}
 
 					catch(Throwable ex)
@@ -102,7 +102,7 @@ public class RestlessServlet extends ShadowServlet
 					JSONObject x = UniversalParser.toJSON(new RError("Exception thrown while handling request. " + e.getMessage() + " (" + e.getClass().getSimpleName() + ")"));
 					x.put("sr-type", RError.class.getCanonicalName());
 					x.put("sr-who", who);
-					write(resp, x.toString(0));
+					write(resp, x.toString(0) + "\n");
 				}
 
 				catch(Throwable ex)
@@ -124,7 +124,7 @@ public class RestlessServlet extends ShadowServlet
 				JSONObject x = UniversalParser.toJSON(new RError("Missing parameter j"));
 				x.put("sr-type", RError.class.getCanonicalName());
 				x.put("sr-who", who);
-				write(resp, x.toString(0));
+				write(resp, x.toString(0) + "\n");
 			}
 
 			catch(Throwable e)
