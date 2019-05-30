@@ -1,15 +1,21 @@
 package io.shadowrealm.shade.module;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Egg;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SplashPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,6 +32,9 @@ public class SMStacks extends ShadeModule
 	@Key("enable")
 	public static boolean enabled = false;
 
+	@Key("remove-glass-bottles")
+	public static boolean removeBottles = true;
+
 	//@builder
 	@Key("override-max-size")
 	public static GList<String> stackOverrides = new GList<String>()
@@ -39,7 +48,24 @@ public class SMStacks extends ShadeModule
 	.qadd("SPLASH_POTION=64");
 	//@done
 
-	private GMap<Material, Integer> overrides;
+	//@builder
+	@Key("override-use-cooldown-ticks")
+	public static GList<String> cooldownUseOverrides = new GList<String>()
+	.qadd("ENDER_PEARL=35")
+	.qadd("LINGERING_POTION=15")
+	.qadd("SPLASH_POTION=7");
+	//@done
+
+	//@builder
+	@Key("override-consume-cooldown-ticks")
+	public static GList<String> cooldownConsumeOverrides = new GList<String>()
+	.qadd("POTION=5")
+	.qadd("GOLDEN_APPLE=65");
+	//@done
+
+	private GMap<Material, Integer> overridesStackSize;
+	private GMap<Material, Integer> overridesCooldownUse;
+	private GMap<Material, Integer> overridesCooldownConsume;
 
 	@Permission
 	public static PermissionShade perm;
@@ -52,7 +78,9 @@ public class SMStacks extends ShadeModule
 	@Override
 	public void start()
 	{
-		overrides = new GMap<>();
+		overridesCooldownUse = new GMap<>();
+		overridesCooldownConsume = new GMap<>();
+		overridesStackSize = new GMap<>();
 
 		for(String i : stackOverrides)
 		{
@@ -60,7 +88,39 @@ public class SMStacks extends ShadeModule
 			{
 				try
 				{
-					overrides.put(Material.valueOf(i.split("\\Q=\\E")[0]), Integer.valueOf(i.split("\\Q=\\E")[1]));
+					overridesStackSize.put(Material.valueOf(i.split("\\Q=\\E")[0]), Integer.valueOf(i.split("\\Q=\\E")[1]));
+				}
+
+				catch(Throwable e)
+				{
+					f("Cannot process: " + i + ", Ignoring.");
+				}
+			}
+		}
+
+		for(String i : cooldownUseOverrides)
+		{
+			if(i.contains("="))
+			{
+				try
+				{
+					overridesCooldownUse.put(Material.valueOf(i.split("\\Q=\\E")[0]), Integer.valueOf(i.split("\\Q=\\E")[1]));
+				}
+
+				catch(Throwable e)
+				{
+					f("Cannot process: " + i + ", Ignoring.");
+				}
+			}
+		}
+
+		for(String i : cooldownConsumeOverrides)
+		{
+			if(i.contains("="))
+			{
+				try
+				{
+					overridesCooldownConsume.put(Material.valueOf(i.split("\\Q=\\E")[0]), Integer.valueOf(i.split("\\Q=\\E")[1]));
 				}
 
 				catch(Throwable e)
@@ -71,6 +131,88 @@ public class SMStacks extends ShadeModule
 		}
 	}
 
+	@EventHandler
+	public void on(PlayerItemConsumeEvent e)
+	{
+		if(removeBottles && e.getItem().getType().equals(Material.POTION))
+		{
+			J.s(() -> removeOneBottle(e.getPlayer()));
+		}
+
+		if(overridesCooldownConsume.containsKey(e.getItem().getType()))
+		{
+			J.s(() -> e.getPlayer().setCooldown(e.getItem().getType(), overridesCooldownConsume.get(e.getItem().getType())));
+		}
+	}
+
+	@EventHandler
+	public void on(ProjectileLaunchEvent e)
+	{
+		if(e.getEntity().getShooter() instanceof Player)
+		{
+			Player p = (Player) e.getEntity().getShooter();
+
+			if(e.getEntity() instanceof EnderPearl)
+			{
+				used(p, Material.ENDER_PEARL);
+			}
+
+			if(e.getEntity() instanceof SplashPotion)
+			{
+				used(p, Material.SPLASH_POTION);
+			}
+
+			if(e.getEntity() instanceof LingeringPotion)
+			{
+				used(p, Material.LINGERING_POTION);
+			}
+
+			if(e.getEntity() instanceof Egg)
+			{
+				used(p, Material.EGG);
+			}
+		}
+	}
+
+	private void used(Player p, Material mat)
+	{
+		if(overridesCooldownUse.containsKey(mat))
+		{
+			J.s(() -> p.setCooldown(mat, overridesCooldownUse.get(mat)));
+		}
+	}
+
+	private void removeOneBottle(Player p)
+	{
+		ItemStack[] is = p.getInventory().getContents();
+
+		for(int i = 0; i < is.length; i++)
+		{
+			if(is[i] != null)
+			{
+				if(is[i].getType().equals(Material.GLASS_BOTTLE))
+				{
+					ItemStack stack = is[i].clone();
+					if(stack.getAmount() > 1)
+					{
+						stack.setAmount(stack.getAmount() - 1);
+					}
+
+					else
+					{
+						stack = null;
+					}
+
+					is[i] = stack;
+					break;
+				}
+			}
+		}
+
+		p.getInventory().setContents(is);
+		p.updateInventory();
+	}
+
 	@Override
 	public boolean isEnabled()
 	{
@@ -79,12 +221,12 @@ public class SMStacks extends ShadeModule
 
 	public int getMaxStackSize(ItemStack is)
 	{
-		return shouldOverride(is) ? overrides.get(is.getType()) : is.getType().getMaxStackSize();
+		return shouldOverride(is) ? overridesStackSize.get(is.getType()) : is.getType().getMaxStackSize();
 	}
 
 	public boolean shouldOverride(ItemStack is)
 	{
-		return overrides.containsKey(is.getType());
+		return overridesStackSize.containsKey(is.getType());
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
