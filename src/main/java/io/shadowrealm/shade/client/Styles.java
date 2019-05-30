@@ -1,7 +1,10 @@
 package io.shadowrealm.shade.client;
 
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
+import mortar.api.sound.Audio;
+import mortar.api.sound.MFADistortion;
 import mortar.compute.math.M;
 import mortar.lang.collection.GList;
 import mortar.logic.format.F;
@@ -9,6 +12,38 @@ import mortar.util.text.C;
 
 public class Styles
 {
+	public static void soundAlert(Player i)
+	{
+		//@builder
+		new Audio()
+		.addChild(new Audio().s(Sound.ENTITY_SHULKER_BULLET_HIT).vp(0.3f, 1.31f))
+		.addChild(new Audio().s(Sound.ITEM_TOTEM_USE).vp(0.1f, 0.01f))
+		.addChild(new MFADistortion(2, 1.9f)
+				.distort(new Audio().s(Sound.ENTITY_ITEMFRAME_ROTATE_ITEM).vp(1f, 0.85f)))
+		.play(i);
+		//@done
+	}
+
+	public static void soundTabComplete(Player i)
+	{
+		new Audio().s(Sound.ENTITY_ITEMFRAME_ROTATE_ITEM).vp(1.25f, 1.2f).play(i);
+	}
+
+	public static void soundChatSend(Player i)
+	{
+		new Audio().s(Sound.ENTITY_ITEMFRAME_BREAK).vp(1.25f, 1.4f).play(i);
+	}
+
+	public static void soundCommandSend(Player i)
+	{
+		new Audio().s(Sound.ENTITY_ITEMFRAME_PLACE).vp(1.25f, 1.2f).play(i);
+	}
+
+	public static void soundChatReceive(Player i)
+	{
+		new Audio().s(Sound.ENTITY_CHICKEN_STEP).vp(0.17f, 0.1f).play(i);
+	}
+
 	public static void cleared(Player i, String who)
 	{
 		clearChatRaw(i, F.color("            &d\u2720 &d&l" + who + " &8&lcleared the chat &d\u2720            "));
@@ -26,6 +61,7 @@ public class Styles
 
 	private static void superHR(Player i, String v, C bright, C dark, int height, int offset)
 	{
+		soundAlert(i);
 		for(int j = 0; j < height; j++)
 		{
 			if(j != height - offset)
