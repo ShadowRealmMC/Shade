@@ -17,7 +17,7 @@ public class RInit extends RestlessObject
 	{
 		int min = ServerConfig.WEBSERVER__CLIENT_PORT_POOL__MIN;
 		int max = ServerConfig.WEBSERVER__CLIENT_PORT_POOL__MAX;
-		GMap<String, VirtualServer> ports = ShadeServer.instance.getServerPorts();
+		GMap<String, VirtualServer> ports = ShadeServer.instance.getServers();
 
 		for(String i : ServerConfig.PORT_OVERRIDES)
 		{

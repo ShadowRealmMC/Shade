@@ -19,6 +19,7 @@ import io.shadowrealm.shade.common.RestlessSide;
 import io.shadowrealm.shade.common.VirtualServer;
 import io.shadowrealm.shade.common.messages.RKeepAlive;
 import io.shadowrealm.shade.common.messages.RKeptAlive;
+import io.shadowrealm.shade.common.messages.RSendMessage;
 import io.shadowrealm.shade.common.messages.RServerStateChanged;
 import mortar.api.config.Configurator;
 import mortar.lang.collection.GList;
@@ -34,12 +35,14 @@ public class ShadeServer extends Plugin implements Listener
 	private GMap<String, VirtualServer> serverPorts;
 	private Server server;
 	private OSQL osql;
+	private GList<RSendMessage> relayingMessages;
 	public static ShadeServer instance;
 
 	@Override
 	public void onEnable()
 	{
 		instance = this;
+		relayingMessages = new GList<>();
 		serverPorts = new GMap<>();
 		ServerConfig.PORT_OVERRIDES.copy();
 		Configurator.DEFAULT.load(ServerConfig.class, new File(getDataFolder(), "config.json"));
@@ -127,7 +130,7 @@ public class ShadeServer extends Plugin implements Listener
 		}).start();
 	}
 
-	public GMap<String, VirtualServer> getServerPorts()
+	public GMap<String, VirtualServer> getServers()
 	{
 		return serverPorts;
 	}
@@ -171,7 +174,7 @@ public class ShadeServer extends Plugin implements Listener
 	{
 		GList<ConnectableServer> s = new GList<>();
 
-		for(VirtualServer i : getServerPorts().v())
+		for(VirtualServer i : getServers().v())
 		{
 			s.add(new ConnectableServer(i.getName(), i.getId(), i.getStatus(), i.getTagline(), i.getSince(), i.getCount()));
 		}
@@ -179,16 +182,16 @@ public class ShadeServer extends Plugin implements Listener
 		return s;
 	}
 
-	public void updateServer(ConnectableServer server)
+	public boolean updateServer(ConnectableServer server)
 	{
 		if(server == null)
 		{
-			return;
+			return false;
 		}
 
-		if(getServerPorts().containsKey(server.getId()))
+		if(getServers().containsKey(server.getId()))
 		{
-			VirtualServer s = getServerPorts().get(server.getId());
+			VirtualServer s = getServers().get(server.getId());
 			s.setCount(server.getOnline());
 			s.setSince(server.getSince());
 			s.setStatus(server.getStatus());
@@ -203,6 +206,10 @@ public class ShadeServer extends Plugin implements Listener
 
 				new RServerStateChanged().server(server).completeBlind(serverPorts.get(i).getConnector());
 			}
+
+			return true;
 		}
+
+		return false;
 	}
 }

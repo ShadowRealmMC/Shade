@@ -11,8 +11,12 @@ public class RStateChanged extends RestlessObject
 	@Override
 	public RestlessObject handle()
 	{
-		ShadeServer.instance.updateServer(server);
-		return new ROK();
+		if(ShadeServer.instance.updateServer(server))
+		{
+			return new ROK();
+		}
+
+		return new RError("AUTH");
 	}
 
 	public ConnectableServer server()

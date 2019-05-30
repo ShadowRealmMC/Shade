@@ -13,12 +13,14 @@ import io.shadowrealm.shade.client.command.CommandSR;
 import io.shadowrealm.shade.client.permission.PermissionShade;
 import io.shadowrealm.shade.common.CommonProperties;
 import io.shadowrealm.shade.common.RestlessConnector;
+import io.shadowrealm.shade.common.RestlessObject;
 import io.shadowrealm.shade.common.RestlessServlet;
 import io.shadowrealm.shade.common.RestlessSide;
 import io.shadowrealm.shade.common.messages.RInit;
 import io.shadowrealm.shade.common.messages.RInitialized;
 import io.shadowrealm.shade.common.messages.RKeepAlive;
 import io.shadowrealm.shade.common.messages.RKeptAlive;
+import io.shadowrealm.shade.common.messages.RReceiveMessage;
 import mortar.api.config.Configurator;
 import mortar.api.sched.J;
 import mortar.bukkit.command.Command;
@@ -148,5 +150,10 @@ public class ShadeClient extends MortarPlugin
 	public String getTag(String subTag)
 	{
 		return TXT.makeTag(C.DARK_GRAY, C.LIGHT_PURPLE, C.GRAY, "Shadow");
+	}
+
+	public RestlessObject receive(RReceiveMessage rReceiveMessage)
+	{
+		return null;
 	}
 }

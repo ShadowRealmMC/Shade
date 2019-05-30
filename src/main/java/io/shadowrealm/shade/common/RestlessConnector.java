@@ -56,22 +56,33 @@ public class RestlessConnector
 
 	public JSONObject request(JSONObject request) throws JSONException, IOException
 	{
-		Response r = c.newCall(new Request.Builder().header("Accept-Encoding", "identity").header("Connection", "close").url("http://" + address + ":" + port + "/wire?j=" + encode(request.toString(0))).build()).execute();
-		String x = r.body().string();
-
-		if(x.isEmpty())
-		{
-			return null;
-		}
-
 		try
 		{
-			return new JSONObject(x);
+			Response r = c.newCall(new Request.Builder().header("Accept-Encoding", "identity").header("Connection", "close").url("http://" + address + ":" + port + "/wire?j=" + encode(request.toString(0))).build()).execute();
+			String x = r.body().string();
+			r.close();
+
+			if(x.isEmpty())
+			{
+				return null;
+			}
+
+			try
+			{
+				return new JSONObject(x);
+			}
+
+			catch(Throwable e)
+			{
+				return null;
+			}
 		}
 
 		catch(Throwable e)
 		{
-			return null;
+
 		}
+
+		return null;
 	}
 }

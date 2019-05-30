@@ -10,6 +10,7 @@ import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessConnector;
 import io.shadowrealm.shade.common.messages.RAccount;
 import io.shadowrealm.shade.common.messages.RCycleData;
+import io.shadowrealm.shade.common.messages.RError;
 import io.shadowrealm.shade.common.messages.RGetAccount;
 import io.shadowrealm.shade.common.messages.RGetCycleData;
 import io.shadowrealm.shade.common.messages.RGetRanks;
@@ -28,6 +29,7 @@ import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
 import mortar.logic.queue.ChronoLatch;
+import mortar.util.text.D;
 
 public class ShadowPlayerController extends Controller
 {
@@ -53,7 +55,7 @@ public class ShadowPlayerController extends Controller
 		latch = new ChronoLatch(10000);
 		online = 0;
 		tagline = "";
-		status = "&eSyncronizing...";
+		status = "&aOnline";
 		since = M.ms();
 		lastState = new ConnectableServer(ClientConfig.SERVER__NAME, ClientConfig.SERVER__ID, status, tagline, since, P.onlinePlayers().size());
 		shadows = new GMap<>();
@@ -62,6 +64,7 @@ public class ShadowPlayerController extends Controller
 		J.ar(() -> updateState(), 20 * 2);
 		J.s(() -> status = "&aOnline", 100);
 		J.s(() -> since = M.ms(), 100);
+		J.ar(() -> tagline = M.rand(5, 1000) + " Woo!", 25);
 	}
 
 	private void updateState()
@@ -75,8 +78,20 @@ public class ShadowPlayerController extends Controller
 			lastState.setStatus(status);
 			lastState.setSince(since);
 			lastState.setOnline(online);
-			new RStateChanged().server(lastState).completeBlind(ShadeClient.instance.getConnector());
+			sendStateChange();
 		}
+	}
+
+	public void sendStateChange()
+	{
+		new RStateChanged().server(lastState).complete(ShadeClient.instance.getConnector(), (r) ->
+		{
+			if(r == null || r instanceof RError)
+			{
+				D.as("Shade Anchor").f("Proxy doesnt know who the fuck we are. WE REALLY NEED TO REBOOT, but ill try to reconnect...");
+				ShadeClient.instance.establishConnection();
+			}
+		});
 	}
 
 	@Override
@@ -85,7 +100,7 @@ public class ShadowPlayerController extends Controller
 		lastState.setStatus("&cRestarting");
 		lastState.setSince(M.ms());
 		lastState.setOnline(0);
-		new RStateChanged().server(lastState).complete(ShadeClient.instance.getConnector());
+		sendStateChange();
 	}
 
 	@Override
