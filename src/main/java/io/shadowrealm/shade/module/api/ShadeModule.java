@@ -1,12 +1,14 @@
 package io.shadowrealm.shade.module.api;
 
+import org.bukkit.event.Listener;
+
 import io.shadowrealm.shade.client.ShadeClient;
 import mortar.api.config.Configurator;
 import mortar.bukkit.command.MortarCommand;
 import mortar.util.text.D;
 import mortar.util.text.Logged;
 
-public abstract class ShadeModule implements IMod, Logged
+public abstract class ShadeModule implements IMod, Logged, Listener
 {
 	private final String name;
 
