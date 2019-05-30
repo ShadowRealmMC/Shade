@@ -86,6 +86,7 @@ public class ShadeClient extends MortarPlugin
 				if(mod.isEnabled())
 				{
 					mod.v("Enabling SubModule: " + mod.getName());
+					registerListener(mod);
 					mod.start();
 				}
 			}
