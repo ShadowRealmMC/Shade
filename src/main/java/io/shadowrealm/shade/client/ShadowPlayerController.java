@@ -64,7 +64,6 @@ public class ShadowPlayerController extends Controller
 		J.ar(() -> updateState(), 20 * 2);
 		J.s(() -> status = "&aOnline", 100);
 		J.s(() -> since = M.ms(), 100);
-		J.ar(() -> tagline = M.rand(5, 1000) + " Woo!", 25);
 	}
 
 	private void updateState()

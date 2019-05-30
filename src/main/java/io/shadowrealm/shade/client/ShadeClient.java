@@ -1,15 +1,13 @@
 package io.shadowrealm.shade.client;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.servlet.Servlet;
 
-import org.bukkit.Bukkit;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
-import io.shadowrealm.shade.client.command.CommandChat;
-import io.shadowrealm.shade.client.command.CommandSR;
 import io.shadowrealm.shade.client.permission.PermissionShade;
 import io.shadowrealm.shade.common.CommonProperties;
 import io.shadowrealm.shade.common.RestlessConnector;
@@ -21,12 +19,12 @@ import io.shadowrealm.shade.common.messages.RInitialized;
 import io.shadowrealm.shade.common.messages.RKeepAlive;
 import io.shadowrealm.shade.common.messages.RKeptAlive;
 import io.shadowrealm.shade.common.messages.RReceiveMessage;
+import io.shadowrealm.shade.module.api.ShadeModule;
 import mortar.api.config.Configurator;
-import mortar.api.sched.J;
-import mortar.bukkit.command.Command;
 import mortar.bukkit.command.Permission;
 import mortar.bukkit.plugin.Control;
 import mortar.bukkit.plugin.Instance;
+import mortar.bukkit.plugin.JarScannerSpecial;
 import mortar.bukkit.plugin.MortarPlugin;
 import mortar.util.text.C;
 import mortar.util.text.TXT;
@@ -46,12 +44,6 @@ public class ShadeClient extends MortarPlugin
 	@Instance
 	public static ShadeClient instance;
 
-	@Command("SR")
-	public CommandSR sr;
-
-	@Command("Chat")
-	public CommandChat chat;
-
 	@Permission
 	public static PermissionShade perm;
 
@@ -67,6 +59,42 @@ public class ShadeClient extends MortarPlugin
 		CommonProperties.DOWNLOAD_UPDATES = ClientConfig.DOWNLOAD_UPDATES;
 		RestlessServlet.who = ClientConfig.SERVER__ID;
 		establishConnection();
+		startMicroModules();
+	}
+
+	private void startMicroModules()
+	{
+		JarScannerSpecial s = new JarScannerSpecial(getFile(), "io.shadowrealm.shade.module");
+		try
+		{
+			s.scan();
+		}
+
+		catch(IOException e1)
+		{
+			e1.printStackTrace();
+		}
+
+		for(Class<?> i : s.getClasses())
+		{
+			try
+			{
+				ShadeModule mod = (ShadeModule) i.getConstructor().newInstance();
+				mod.v("Loading SubModule: " + mod.getName());
+				mod.loadConfiguration();
+
+				if(mod.isEnabled())
+				{
+					mod.v("Enabling SubModule: " + mod.getName());
+					mod.start();
+				}
+			}
+
+			catch(Throwable e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void establishConnection()
@@ -105,7 +133,6 @@ public class ShadeClient extends MortarPlugin
 						else
 						{
 							f("Proxy cant seem to communicate with us!");
-							J.s(() -> Bukkit.getPluginManager().disablePlugin(this));
 						}
 					});
 
@@ -115,14 +142,12 @@ public class ShadeClient extends MortarPlugin
 				{
 					e.printStackTrace();
 					f("ERROR! Couldnt bind port!!!");
-					J.s(() -> Bukkit.getPluginManager().disablePlugin(this));
 				}
 			}
 
 			else
 			{
 				f("ERROR! Proxy couldnt establish a port!!!");
-				J.s(() -> Bukkit.getPluginManager().disablePlugin(this));
 			}
 		});
 		//@done
