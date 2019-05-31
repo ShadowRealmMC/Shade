@@ -3,12 +3,14 @@ package io.shadowrealm.shade.module;
 import org.bukkit.Material;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.EnderPearl;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SplashPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
@@ -34,6 +36,9 @@ public class SMStacks extends ShadeModule
 
 	@Key("remove-glass-bottles")
 	public static boolean removeBottles = true;
+
+	@Key("prevent-destruction-from-world")
+	public static boolean preventDestruction = true;
 
 	//@builder
 	@Key("override-max-size")
@@ -73,6 +78,20 @@ public class SMStacks extends ShadeModule
 	public SMStacks()
 	{
 		super("Stacks");
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void on(EntityDamageByBlockEvent e)
+	{
+		if(!preventDestruction)
+		{
+			return;
+		}
+
+		if(e.getEntityType().equals(EntityType.DROPPED_ITEM))
+		{
+			e.setCancelled(true);
+		}
 	}
 
 	@Override
