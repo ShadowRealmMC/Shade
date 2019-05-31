@@ -66,11 +66,19 @@ public abstract class RestlessObject implements RestlessCompletable
 			@Override
 			public void run()
 			{
-				c.run(complete(co));
+				try
+				{
+					c.run(complete(co));
+				}
+
+				catch(Throwable e)
+				{
+					e.printStackTrace();
+				}
 			}
 		});
 	}
-	
+
 	@Override
 	public void completeBlind(RestlessConnector co)
 	{

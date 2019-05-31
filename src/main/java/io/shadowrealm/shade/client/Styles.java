@@ -12,6 +12,23 @@ import mortar.util.text.C;
 
 public class Styles
 {
+	private static final String[] RGB = new String[] {C.RED.toString(), C.GREEN.toString(), C.BLUE.toString(), C.AQUA.toString(), C.YELLOW.toString(), C.LIGHT_PURPLE.toString(), C.GOLD.toString()};
+
+	public static String rgbify(String s)
+	{
+		s = C.stripColor(s);
+		StringBuilder buffer = new StringBuilder(s.length());
+		char[] charbuf = s.toCharArray();
+		int offset = M.rand(0, RGB.length);
+
+		for(int i = 0; i < charbuf.length; i++)
+		{
+			buffer.append(RGB[(i + offset) % RGB.length] + charbuf[i]);
+		}
+
+		return buffer.toString();
+	}
+
 	public static void soundAlert(Player i)
 	{
 		//@builder
@@ -59,6 +76,30 @@ public class Styles
 		superHR(i, F.color(bright + "            \u2720 " + bright + "&l" + message + bright + " \u2720"), bright, dark, 6, 3);
 	}
 
+	private static void superHR(Player i, String v, int height, int offset)
+	{
+		soundAlert(i);
+		for(int j = 0; j < height; j++)
+		{
+			if(j != height - offset)
+			{
+				String k = "";
+
+				for(int l = 0; l < 75; l++)
+				{
+					k = k + (Math.random() < 0.11 ? C.WHITE + (M.r(0.45) ? "\u25CF" : "\u2022") : " ");
+				}
+
+				i.sendMessage(rgbify(k));
+			}
+
+			if(j == height - offset)
+			{
+				i.sendMessage(rgbify(v));
+			}
+		}
+	}
+
 	private static void superHR(Player i, String v, C bright, C dark, int height, int offset)
 	{
 		soundAlert(i);
@@ -87,5 +128,10 @@ public class Styles
 	private static void clearChatRaw(Player i, String mainline)
 	{
 		superHR(i, mainline, C.LIGHT_PURPLE, C.DARK_PURPLE, 120, 5);
+	}
+
+	public static void superBorderRGB(Player i, String message)
+	{
+		superHR(i, rgbify("            \u2720" + message + " \u2720"), 6, 3);
 	}
 }

@@ -16,7 +16,7 @@ public class ShadowUnlock
 	@Column(name = "type", type = "VARCHAR(36)", placeholder = "type_id")
 	private String type;
 
-	@Column(name = "name", type = "VARCHAR(36)", placeholder = "Unlock Name")
+	@Column(name = "name", type = "TEXT", placeholder = "Unlock Name")
 	private String name;
 
 	@Column(name = "description", type = "TEXT", placeholder = "Describes what this unlock does.")

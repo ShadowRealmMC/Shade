@@ -1,5 +1,6 @@
 package io.shadowrealm.shade.common.table;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -29,6 +30,9 @@ public class ShadowAccount
 
 	@Column(name = "unlocks", type = "TEXT", placeholder = "")
 	private String unlocks;
+
+	@Column(name = "settings", type = "TEXT", placeholder = "")
+	private String settings;
 
 	@Column(name = "last_cycle", type = "BIGINT", placeholder = "0")
 	private long lastCycle;
@@ -148,6 +152,34 @@ public class ShadowAccount
 		this.cachedServer = cachedServer;
 	}
 
+	public JSONObject getSettings()
+	{
+		try
+		{
+			return new JSONObject(Hasher.decompress(settings));
+		}
+
+		catch(JSONException | IOException e)
+		{
+
+		}
+
+		return new JSONObject();
+	}
+
+	public void setSettings(JSONObject o)
+	{
+		try
+		{
+			settings = Hasher.compress(o.toString(0));
+		}
+
+		catch(JSONException | IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	public Map<String, UnlockedItem> getUnlocks()
 	{
 		if(unlocks.isEmpty())
@@ -208,5 +240,10 @@ public class ShadowAccount
 		{
 			e.printStackTrace();
 		}
+	}
+
+	public void setSettings(String settings)
+	{
+		this.settings = settings;
 	}
 }

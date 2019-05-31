@@ -8,12 +8,15 @@ import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.TabCompleteEvent;
 
+import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.Styles;
 import io.shadowrealm.shade.client.command.CommandChat;
 import io.shadowrealm.shade.client.permission.PermissionShade;
 import io.shadowrealm.shade.module.api.ShadeModule;
 import mortar.api.config.Key;
 import mortar.bukkit.command.Permission;
+import mortar.lang.json.JSONObject;
+import mortar.util.text.C;
 
 public class SMChat extends ShadeModule
 {
@@ -25,6 +28,9 @@ public class SMChat extends ShadeModule
 
 	@Key("chat-unlocks.color")
 	public static boolean chatColorUnlocks = true;
+
+	@Key("chat-unlocks.default-color")
+	public static String defaultChatColor = "GRAY";
 
 	@Key("sounds.send-chat")
 	public static boolean sendSounds = true;
@@ -86,6 +92,32 @@ public class SMChat extends ShadeModule
 				}
 
 				Styles.soundChatReceive(i);
+			}
+		}
+
+		if(chatColorUnlocks)
+		{
+			JSONObject settings = Shade.getSettings(e.getPlayer());
+			C i = C.valueOf(defaultChatColor);
+
+			try
+			{
+				i = C.valueOf(settings.getString("chat-color"));
+			}
+
+			catch(Throwable ex)
+			{
+
+			}
+
+			if(i.equals(C.MAGIC))
+			{
+				e.setMessage(Styles.rgbify(e.getMessage()));
+			}
+
+			else
+			{
+				e.setMessage(i + e.getMessage());
 			}
 		}
 	}

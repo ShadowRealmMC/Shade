@@ -5,9 +5,6 @@ import java.util.UUID;
 import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.ShadeClient;
 import io.shadowrealm.shade.common.UnlockedItem;
-import io.shadowrealm.shade.common.messages.RError;
-import io.shadowrealm.shade.common.messages.ROK;
-import io.shadowrealm.shade.common.messages.RUnlock;
 import io.shadowrealm.shade.common.table.ShadowUnlock;
 import mortar.bukkit.command.Command;
 import mortar.bukkit.command.MortarCommand;
@@ -77,26 +74,7 @@ public class CommandUnlock extends MortarCommand
 			}
 		}
 
-		int aa = a;
-
-		new RUnlock().player(player).unlock(new UnlockedItem(u.getId(), a)).complete(Shade.connect(), (r) ->
-		{
-			if(r != null && r instanceof ROK)
-			{
-				sender.sendMessage(args[1] + " was given " + (aa > 1 ? (aa + "x ") : "") + args[0]);
-			}
-
-			else if(r != null && r instanceof RError)
-			{
-				RError error = (RError) r;
-				sender.sendMessage("Failed to give " + (aa > 1 ? (aa + "x ") : "") + args[0] + " to " + args[1] + ". Reason: " + error.message());
-			}
-
-			else
-			{
-				sender.sendMessage("Failed to give " + (aa > 1 ? (aa + "x ") : "") + args[0] + " to " + args[1] + ". Reason: NULL RESPONSE");
-			}
-		});
+		Shade.unlock(sender, args[1], player, new UnlockedItem(u.getId(), a));
 
 		return true;
 	}
