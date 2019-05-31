@@ -19,6 +19,7 @@ public class RError extends RestlessObject
 	@Override
 	public RestlessObject handle()
 	{
+		System.out.println("Error: " + message);
 		return null;
 	}
 

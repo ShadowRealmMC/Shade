@@ -19,12 +19,6 @@ public class ShadowRank
 	@Column(name = "chat_color", type = "VARCHAR(36)", placeholder = "&f")
 	private String chatColor;
 
-	@Column(name = "on_add", type = "TEXT", placeholder = "/givestuff\n/givemorestuff")
-	private String onAdd;
-
-	@Column(name = "on_remove", type = "TEXT", placeholder = "/takestuff\n/takemorestuff")
-	private String onRemove;
-
 	@Column(name = "min_sr", type = "BIGINT", placeholder = "0")
 	private long minSR;
 
@@ -125,25 +119,5 @@ public class ShadowRank
 	public void setChatColor(String chatColor)
 	{
 		this.chatColor = chatColor;
-	}
-
-	public String getOnAdd()
-	{
-		return onAdd;
-	}
-
-	public void setOnAdd(String onAdd)
-	{
-		this.onAdd = onAdd;
-	}
-
-	public String getOnRemove()
-	{
-		return onRemove;
-	}
-
-	public void setOnRemove(String onRemove)
-	{
-		this.onRemove = onRemove;
 	}
 }

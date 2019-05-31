@@ -3,20 +3,19 @@ package io.shadowrealm.shade.client.command;
 import mortar.bukkit.command.MortarCommand;
 import mortar.bukkit.command.MortarSender;
 
-public class CommandSRGive extends MortarCommand
+public class CommandUnlock extends MortarCommand
 {
-	public CommandSRGive()
+	public CommandUnlock()
 	{
-		super("give", "+", "add", "earn");
+		super("unlock");
 	}
 
 	@Override
 	public boolean handle(MortarSender sender, String[] args)
 	{
-		// String name = args[0];
-		// long amount = Long.valueOf(args[1]);
 		sender.sendMessage("NYI");
 
 		return true;
 	}
+
 }

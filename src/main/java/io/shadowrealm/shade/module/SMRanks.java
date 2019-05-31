@@ -6,7 +6,7 @@ import io.shadowrealm.shade.module.api.ShadeModule;
 import mortar.api.config.Key;
 import mortar.bukkit.command.Permission;
 
-public class SMShadow extends ShadeModule
+public class SMRanks extends ShadeModule
 {
 	@Key("enable")
 	public static boolean enabled = true;
@@ -14,9 +14,9 @@ public class SMShadow extends ShadeModule
 	@Permission
 	public static PermissionShade perm;
 
-	public SMShadow()
+	public SMRanks()
 	{
-		super("Shadow");
+		super("Ranks");
 	}
 
 	@Override

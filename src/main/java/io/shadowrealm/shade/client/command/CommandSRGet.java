@@ -13,7 +13,7 @@ public class CommandSRGet extends MortarCommand
 	@Override
 	public boolean handle(MortarSender sender, String[] args)
 	{
-		String name = args[0];
+		// String name = args[0];
 		sender.sendMessage("NYI");
 
 		return true;

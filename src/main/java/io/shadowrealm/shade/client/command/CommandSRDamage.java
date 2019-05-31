@@ -13,8 +13,8 @@ public class CommandSRDamage extends MortarCommand
 	@Override
 	public boolean handle(MortarSender sender, String[] args)
 	{
-		String name = args[0];
-		long amount = Long.valueOf(args[1]);
+		// String name = args[0];
+		// long amount = Long.valueOf(args[1]);
 		sender.sendMessage("NYI");
 
 		return true;

@@ -19,7 +19,6 @@ import io.shadowrealm.shade.common.RestlessSide;
 import io.shadowrealm.shade.common.VirtualServer;
 import io.shadowrealm.shade.common.messages.RKeepAlive;
 import io.shadowrealm.shade.common.messages.RKeptAlive;
-import io.shadowrealm.shade.common.messages.RSendMessage;
 import io.shadowrealm.shade.common.messages.RServerStateChanged;
 import mortar.api.config.Configurator;
 import mortar.lang.collection.GList;
@@ -35,14 +34,12 @@ public class ShadeServer extends Plugin implements Listener
 	private GMap<String, VirtualServer> serverPorts;
 	private Server server;
 	private OSQL osql;
-	private GList<RSendMessage> relayingMessages;
 	public static ShadeServer instance;
 
 	@Override
 	public void onEnable()
 	{
 		instance = this;
-		relayingMessages = new GList<>();
 		serverPorts = new GMap<>();
 		ServerConfig.PORT_OVERRIDES.copy();
 		Configurator.DEFAULT.load(ServerConfig.class, new File(getDataFolder(), "config.json"));

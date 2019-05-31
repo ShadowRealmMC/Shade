@@ -14,13 +14,16 @@ import io.shadowrealm.shade.common.messages.RError;
 import io.shadowrealm.shade.common.messages.RGetAccount;
 import io.shadowrealm.shade.common.messages.RGetCycleData;
 import io.shadowrealm.shade.common.messages.RGetRanks;
+import io.shadowrealm.shade.common.messages.RGetUnlocks;
 import io.shadowrealm.shade.common.messages.RGiveSXP;
 import io.shadowrealm.shade.common.messages.RLoggedIn;
 import io.shadowrealm.shade.common.messages.RRanks;
 import io.shadowrealm.shade.common.messages.RSXPChanged;
 import io.shadowrealm.shade.common.messages.RStateChanged;
+import io.shadowrealm.shade.common.messages.RUnlocks;
 import io.shadowrealm.shade.common.table.ShadowAccount;
 import io.shadowrealm.shade.common.table.ShadowRank;
+import io.shadowrealm.shade.common.table.ShadowUnlock;
 import mortar.api.sched.J;
 import mortar.api.world.P;
 import mortar.bukkit.plugin.Controller;
@@ -35,6 +38,7 @@ public class ShadowPlayerController extends Controller
 {
 	private GMap<Player, ShadowAccount> shadows;
 	private GList<ShadowRank> ranks;
+	private GList<ShadowUnlock> unlocks;
 	private long cycleInterval;
 	private ConnectableServer lastState;
 	private String status;
@@ -60,6 +64,7 @@ public class ShadowPlayerController extends Controller
 		lastState = new ConnectableServer(ClientConfig.SERVER__NAME, ClientConfig.SERVER__ID, status, tagline, since, P.onlinePlayers().size());
 		shadows = new GMap<>();
 		new RGetRanks().complete(ShadeClient.instance.getConnector(), (r) -> ranks = new GList<>(((RRanks) r).ranks()));
+		new RGetUnlocks().complete(ShadeClient.instance.getConnector(), (r) -> unlocks = new GList<>(((RUnlocks) r).unlocks()));
 		new RGetCycleData().complete(ShadeClient.instance.getConnector(), (r) -> cycleInterval = ((RCycleData) r).cycle());
 		J.ar(() -> updateState(), 20 * 2);
 		J.s(() -> status = "&aOnline", 100);
@@ -252,5 +257,40 @@ public class ShadowPlayerController extends Controller
 	public long getCycleInterval()
 	{
 		return cycleInterval;
+	}
+
+	public GList<ShadowUnlock> getUnlocks()
+	{
+		return unlocks;
+	}
+
+	public ConnectableServer getLastState()
+	{
+		return lastState;
+	}
+
+	public String getStatus()
+	{
+		return status;
+	}
+
+	public String getTagline()
+	{
+		return tagline;
+	}
+
+	public long getSince()
+	{
+		return since;
+	}
+
+	public int getOnline()
+	{
+		return online;
+	}
+
+	public ChronoLatch getLatch()
+	{
+		return latch;
 	}
 }

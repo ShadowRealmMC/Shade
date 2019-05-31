@@ -1,10 +1,17 @@
 package io.shadowrealm.shade.common.table;
 
+import java.util.Map;
 import java.util.UUID;
 
+import io.shadowrealm.shade.common.UnlockedItem;
 import mortar.api.sql.Column;
 import mortar.api.sql.Table;
 import mortar.api.sql.TableCache;
+import mortar.api.sql.UniversalParser;
+import mortar.lang.collection.GMap;
+import mortar.lang.json.JSONException;
+import mortar.lang.json.JSONObject;
+import mortar.logic.io.Hasher;
 
 @Table("shadow_accounts")
 public class ShadowAccount
@@ -19,6 +26,9 @@ public class ShadowAccount
 
 	@Column(name = "cached_server", type = "VARCHAR(24)", placeholder = "unidentified")
 	private String cachedServer;
+
+	@Column(name = "unlocks", type = "TEXT", placeholder = "")
+	private String unlocks;
 
 	@Column(name = "last_cycle", type = "BIGINT", placeholder = "0")
 	private long lastCycle;
@@ -50,6 +60,7 @@ public class ShadowAccount
 		this.shadowXPLastEarned = 0;
 		this.amethyst = 0;
 		this.lastCycle = 0;
+		this.unlocks = "";
 	}
 
 	public long getLastCycle()
@@ -135,5 +146,67 @@ public class ShadowAccount
 	public void setCachedServer(String cachedServer)
 	{
 		this.cachedServer = cachedServer;
+	}
+
+	public Map<String, UnlockedItem> getUnlocks()
+	{
+		if(unlocks.isEmpty())
+		{
+			return new GMap<>();
+		}
+
+		try
+		{
+			GMap<String, UnlockedItem> items = new GMap<>();
+			JSONObject object = new JSONObject(Hasher.decompress(unlocks));
+
+			for(String i : object.keySet())
+			{
+				try
+				{
+					items.put(i, UniversalParser.fromJSON(object.getJSONObject(i), UnlockedItem.class));
+				}
+
+				catch(Throwable e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+			return items;
+		}
+
+		catch(Throwable e)
+		{
+			return new GMap<>();
+		}
+	}
+
+	public void setUnlocks(Map<String, UnlockedItem> items)
+	{
+		JSONObject o = new JSONObject();
+
+		for(String i : items.keySet())
+		{
+			try
+			{
+				o.put(i, UniversalParser.toJSON(items.get(i)));
+			}
+
+			catch(JSONException | IllegalArgumentException | IllegalAccessException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		try
+		{
+			unlocks = Hasher.compress(o.toString(0));
+		}
+
+		catch(Throwable e)
+		{
+			e.printStackTrace();
+		}
 	}
 }
