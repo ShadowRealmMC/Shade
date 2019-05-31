@@ -23,6 +23,9 @@ public class SMChat extends ShadeModule
 	@Key("chat-commands")
 	public static boolean chatCommands = true;
 
+	@Key("chat-unlocks.color")
+	public static boolean chatColorUnlocks = true;
+
 	@Key("sounds.send-chat")
 	public static boolean sendSounds = true;
 

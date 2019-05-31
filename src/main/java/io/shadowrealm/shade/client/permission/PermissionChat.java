@@ -14,6 +14,9 @@ public class PermissionChat extends MortarPermission
 	@Permission
 	public PermissionBroadcast broadcast;
 
+	@Permission
+	public PermissionChangeColor changeColor;
+
 	@Override
 	protected String getNode()
 	{

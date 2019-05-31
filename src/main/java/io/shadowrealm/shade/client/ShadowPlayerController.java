@@ -64,7 +64,11 @@ public class ShadowPlayerController extends Controller
 		lastState = new ConnectableServer(ClientConfig.SERVER__NAME, ClientConfig.SERVER__ID, status, tagline, since, P.onlinePlayers().size());
 		shadows = new GMap<>();
 		new RGetRanks().complete(ShadeClient.instance.getConnector(), (r) -> ranks = new GList<>(((RRanks) r).ranks()));
-		new RGetUnlocks().complete(ShadeClient.instance.getConnector(), (r) -> unlocks = new GList<>(((RUnlocks) r).unlocks()));
+		new RGetUnlocks().complete(ShadeClient.instance.getConnector(), (r) ->
+		{
+			unlocks = new GList<>(((RUnlocks) r).unlocks());
+			l("Unlocks" + unlocks.size());
+		});
 		new RGetCycleData().complete(ShadeClient.instance.getConnector(), (r) -> cycleInterval = ((RCycleData) r).cycle());
 		J.ar(() -> updateState(), 20 * 2);
 		J.s(() -> status = "&aOnline", 100);
@@ -293,4 +297,5 @@ public class ShadowPlayerController extends Controller
 	{
 		return latch;
 	}
+
 }

@@ -23,10 +23,10 @@ public class ShadowUnlock
 	private String description;
 
 	@Column(name = "consumable", type = "TINYINT", placeholder = "0")
-	private byte consumable;
+	private int consumable;
 
 	@Column(name = "singleton", type = "TINYINT", placeholder = "1")
-	private byte singleton;
+	private int singleton;
 
 	public ShadowUnlock()
 	{

@@ -23,7 +23,7 @@ public class RError extends RestlessObject
 		return null;
 	}
 
-	public String mssage()
+	public String message()
 	{
 		return message;
 	}

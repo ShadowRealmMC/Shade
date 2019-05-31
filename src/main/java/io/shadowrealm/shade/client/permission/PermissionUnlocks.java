@@ -1,26 +1,19 @@
 package io.shadowrealm.shade.client.permission;
 
 import mortar.bukkit.command.MortarPermission;
-import mortar.bukkit.command.Permission;
 
-public class PermissionShade extends MortarPermission
+public class PermissionUnlocks extends MortarPermission
 {
-	@Permission
-	public PermissionChat chat;
-
-	@Permission
-	public PermissionUnlocks unlocks;
-
 	@Override
 	protected String getNode()
 	{
-		return "shade";
+		return "unlocks";
 	}
 
 	@Override
 	public String getDescription()
 	{
-		return "Base shade permission";
+		return "Unlock command (admin)";
 	}
 
 	@Override

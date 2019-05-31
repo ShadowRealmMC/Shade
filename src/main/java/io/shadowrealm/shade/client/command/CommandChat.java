@@ -17,6 +17,9 @@ public class CommandChat extends MortarCommand
 	@Command
 	private CommandChatSuperBroadcast broadcast;
 
+	@Command
+	private CommandChatChangeColor changeColor;
+
 	public CommandChat()
 	{
 		super("chat");
@@ -39,6 +42,11 @@ public class CommandChat extends MortarCommand
 		if(ShadeClient.perm.chat.broadcast.has(sender))
 		{
 			sender.sendMessage("/chat broadcast [msg]" + C.DARK_PURPLE + " - Show a supersized broadcast");
+		}
+
+		if(ShadeClient.perm.chat.changeColor.has(sender))
+		{
+			sender.sendMessage("/chat color" + C.DARK_PURPLE + " - Change your chat color");
 		}
 
 		return true;

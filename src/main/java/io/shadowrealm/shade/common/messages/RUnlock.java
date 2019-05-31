@@ -40,15 +40,41 @@ public class RUnlock extends RestlessObject
 		if(items.containsKey(u.getId()))
 		{
 			items.put(u.getId(), new UnlockedItem(u.getId(), items.get(u.getId()).getAmount() + unlock.getAmount()));
+			a.setUnlocks(items);
+			ShadeServer.instance.getSQL().setAccount(a);
 			return new ROK();
 		}
 
 		if(!items.containsKey(u.getId()))
 		{
 			items.put(u.getId(), unlock);
+			a.setUnlocks(items);
+			ShadeServer.instance.getSQL().setAccount(a);
 			return new ROK();
 		}
 
 		return null;
+	}
+
+	public UUID player()
+	{
+		return player;
+	}
+
+	public UnlockedItem unlock()
+	{
+		return unlock;
+	}
+
+	public RUnlock player(UUID player)
+	{
+		this.player = player;
+		return this;
+	}
+
+	public RUnlock unlock(UnlockedItem unlock)
+	{
+		this.unlock = unlock;
+		return this;
 	}
 }
