@@ -9,6 +9,9 @@ public class PermissionChat extends MortarPermission
 	public PermissionClearChat clear;
 
 	@Permission
+	public PermissionChatBypass bypass;
+
+	@Permission
 	public PermissionClearChatEveryone clearEveryone;
 
 	@Permission
