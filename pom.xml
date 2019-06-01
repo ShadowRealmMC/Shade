@@ -162,6 +162,12 @@
 			<artifactId>JDA</artifactId>
 			<version>3.8.3_463</version>
 		</dependency>
+		<dependency>
+			<groupId>deluxechat</groupId>
+			<artifactId>deluxechat</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<distributionManagement>
 		<repository>
