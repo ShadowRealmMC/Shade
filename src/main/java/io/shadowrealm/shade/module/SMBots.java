@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import io.shadowrealm.shade.client.ShadeClient;
 import io.shadowrealm.shade.client.Styles;
 import io.shadowrealm.shade.client.permission.PermissionShade;
 import io.shadowrealm.shade.module.api.ShadeModule;
@@ -47,9 +48,14 @@ public class SMBots extends ShadeModule
 		moveMoreMessages.add("You should move around before chatting.");
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void on(AsyncPlayerChatEvent e)
 	{
+		if(ShadeClient.perm.chat.bypass.has(e.getPlayer()))
+		{
+			return;
+		}
+
 		if(moveDistance.containsKey(e.getPlayer()))
 		{
 			e.setCancelled(true);
