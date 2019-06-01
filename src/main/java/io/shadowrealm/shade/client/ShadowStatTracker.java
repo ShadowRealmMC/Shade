@@ -107,7 +107,7 @@ public class ShadowStatTracker extends Controller
 				s(e.getPlayer(), "Chests Opened", e.getNewValue() - e.getPreviousValue());
 				break;
 			case CRAFT_ITEM:
-				s(e.getPlayer(), "Items scrafted", e.getNewValue() - e.getPreviousValue());
+				s(e.getPlayer(), "Items Crafted", e.getNewValue() - e.getPreviousValue());
 				break;
 			case DAMAGE_DEALT:
 				s(e.getPlayer(), "Damage Dealt", (e.getNewValue() - e.getPreviousValue()) / 10D);
