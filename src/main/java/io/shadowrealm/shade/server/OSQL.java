@@ -13,6 +13,7 @@ import io.shadowrealm.shade.common.table.ShadowUnlock;
 import mortar.api.sql.SQLKit;
 import mortar.compute.math.M;
 import mortar.lang.collection.GList;
+import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
 import mortar.util.text.C;
 
@@ -42,6 +43,71 @@ public class OSQL
 
 	private void generateUnlocks() throws SQLException
 	{
+		GList<C> colors = new GList<C>();
+		GMap<C, Integer> colorRarity = new GMap<>();
+
+		for(C i : C.values())
+		{
+			if(i.isColor())
+			{
+				colors.add(i);
+
+				switch(i)
+				{
+					case AQUA:
+						colorRarity.put(i, 8);
+						break;
+					case BLACK:
+						colorRarity.put(i, 10);
+						break;
+					case BLUE:
+						colorRarity.put(i, 6);
+						break;
+					case DARK_AQUA:
+						colorRarity.put(i, 4);
+						break;
+					case DARK_BLUE:
+						colorRarity.put(i, 6);
+						break;
+					case DARK_GRAY:
+						colorRarity.put(i, 7);
+						break;
+					case DARK_GREEN:
+						colorRarity.put(i, 3);
+						break;
+					case DARK_PURPLE:
+						colorRarity.put(i, 6);
+						break;
+					case DARK_RED:
+						colorRarity.put(i, 7);
+						break;
+					case GOLD:
+						colorRarity.put(i, 4);
+						break;
+					case GRAY:
+						colorRarity.put(i, 2);
+						break;
+					case GREEN:
+						colorRarity.put(i, 6);
+						break;
+					case LIGHT_PURPLE:
+						colorRarity.put(i, 9);
+						break;
+					case RED:
+						colorRarity.put(i, 6);
+						break;
+					case WHITE:
+						colorRarity.put(i, 3);
+						break;
+					case YELLOW:
+						colorRarity.put(i, 4);
+						break;
+					default:
+						break;
+				}
+			}
+		}
+
 		// Chat Colors & Formats
 		String g = "&" + C.GRAY.getChar();
 
@@ -52,35 +118,51 @@ public class OSQL
 
 			if(i.isColor())
 			{
-				generateUnlock("chat:" + "color_" + i.name().toLowerCase(), false, true, c + n + " Chat Color", g + "Grants the ability to use the color " + n + " when chatting.");
+				generateUnlock("chat:" + "color_" + i.name().toLowerCase(), false, true, c + n + " Chat Color", g + "Grants the ability to use the color " + n + " when chatting.", 35 + (colorRarity.get(i) * 7));
 			}
 
 			else
 			{
-				generateUnlock("chat:" + "format_" + i.name().toLowerCase(), false, true, g + c + n + "&r" + g + " Chat Format", g + "Grants the ability to use the format " + n + " when chatting.");
+				generateUnlock("chat:" + "format_" + i.name().toLowerCase(), false, true, g + c + n + "&r" + g + " Chat Format", g + "Grants the ability to use the format " + n + " when chatting.", 1530);
 			}
 		}
 
-		generateUnlock("chat:color_rgb", false, true, Styles.rgbify("RGB Chat Color").replaceAll("\\Q" + C.COLOR_CHAR + "\\E", "&"), Styles.rgbify("Grants the ability to use all the colors when chatting.").replaceAll("\\Q" + C.COLOR_CHAR + "\\E", "&"));
-		generateUnlock("loot:box", true, false, "Loot Box", "There's stuff inside. Open it.");
-		generateUnlock("loot:shard_multitude", true, false, "Shard of Multitude", "Modify a loot box to give more stuff.");
-		generateUnlock("loot:shard_valor", true, false, "Shard of Valor", "Modify a loot box to give more combat oriented stuff.");
-		generateUnlock("loot:shard_divergence", true, false, "Shard of Divergence", "Modify a loot box to give things not unlocked by anyone recently. (Shard of Hipster)");
-		generateUnlock("loot:shard_magnitude", true, false, "Shard of Magnitude", "Modify a loot box to give rarer stuff.");
-		generateUnlock("loot:shard_impact", true, false, "Shard of Impact", "Modify a loot box to give stuff which adds effects to gameplay.");
-		generateUnlock("loot:shard_ally", true, false, "Shard of Ally", "Modify a loot box to give stuff related to pets & companions.");
+		generateUnlock("chat:color_rgb", false, true, Styles.rgbify("RGB Chat Color").replaceAll("\\Q" + C.COLOR_CHAR + "\\E", "&"), Styles.rgbify("Grants the ability to use all the colors when chatting.").replaceAll("\\Q" + C.COLOR_CHAR + "\\E", "&"), 1650);
+
+		// Loot Boxes & Shards
+		generateUnlock("loot:box", true, false, "Loot Box", "There's stuff inside. Open it.", 10);
+		generateUnlock("loot:shard_multitude", true, false, "Shard of Multitude", "Modify a loot box to give more stuff.", 1250);
+		generateUnlock("loot:shard_valor", true, false, "Shard of Valor", "Modify a loot box to give more combat oriented stuff.", 950);
+		generateUnlock("loot:shard_divergence", true, false, "Shard of Divergence", "Modify a loot box to give things not unlocked by anyone recently. (Shard of Hipster)", 2100);
+		generateUnlock("loot:shard_magnitude", true, false, "Shard of Magnitude", "Modify a loot box to give rarer stuff.", 1450);
+		generateUnlock("loot:shard_impact", true, false, "Shard of Impact", "Modify a loot box to give stuff which adds effects to gameplay.", 950);
+		generateUnlock("loot:shard_ally", true, false, "Shard of Ally", "Modify a loot box to give stuff related to pets & companions.", 950);
 
 		for(C i : C.values())
 		{
 			if(i.isColor())
 			{
 				String n = F.capitalizeWords(i.name().toLowerCase().replaceAll("\\Q_\\E", " "));
-				generateUnlock("loot:shard_" + i.name().toLowerCase(), true, false, "Shard of " + n, "Modify a loot box to give stuff colored " + n);
+				generateUnlock("loot:shard_" + i.name().toLowerCase(), true, false, "Shard of " + n, "Modify a loot box to give stuff colored " + n, 570 + (13 * colorRarity.get(i)));
 			}
 		}
+
+		// ColorFX
+		for(C i : colors)
+		{
+			String n = F.capitalizeWords(i.name().toLowerCase().replaceAll("\\Q_\\E", " "));
+			generateUnlock("arrowfx:arrow_" + i.name().toLowerCase(), false, true, n + " Arrow Trail", "Colors arrow trails " + n, 65 + (5 * colorRarity.get(i)));
+			generateUnlock("sprintfx:sprint_" + i.name().toLowerCase(), false, true, n + " Sprint Trail", "Colors your sprint trail " + n, 125 + (6 * colorRarity.get(i)));
+			generateUnlock("walkfx:walk_" + i.name().toLowerCase(), false, true, n + " Movement Trail", "Colors a trail of " + n + " particles wherever you move.", 125 + (6 * colorRarity.get(i)));
+			generateUnlock("teleportfx:teleport_" + i.name().toLowerCase(), false, true, n + " Teleport Effect", "Makes a cloud of " + n + " particles upon teleport.", 359 + (8 * colorRarity.get(i)));
+			generateUnlock("deathfx:death_" + i.name().toLowerCase(), false, true, n + " Death Effect", "Makes a cloud of " + n + " particles when you die.", 225 + (7 * colorRarity.get(i)));
+		}
+
+		// Special FX
+		generateUnlock("deathfx:death_wither", false, true, "Wither Death Effect", "When you die, you wither away into black particles.", 525);
 	}
 
-	public void generateUnlock(String cid, boolean consumable, boolean singleton, String name, String description) throws SQLException
+	public void generateUnlock(String cid, boolean consumable, boolean singleton, String name, String description, int rarity) throws SQLException
 	{
 		String category = cid.split("\\Q:\\E")[0];
 		String id = cid.split("\\Q:\\E")[1];
@@ -90,6 +172,7 @@ public class OSQL
 		l.setConsumable(consumable);
 		l.setName(name);
 		l.setDescription(description);
+		l.setRarity(rarity + 51);
 
 		k.validate(l);
 		if(!k.has("shadow_unlocks", "id", l.getId()))

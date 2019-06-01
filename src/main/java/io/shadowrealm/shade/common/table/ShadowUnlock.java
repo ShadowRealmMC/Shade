@@ -28,6 +28,9 @@ public class ShadowUnlock
 	@Column(name = "singleton", type = "TINYINT", placeholder = "1")
 	private int singleton;
 
+	@Column(name = "rarity", type = "INT", placeholder = "1")
+	private int rarity;
+
 	public ShadowUnlock()
 	{
 		this("idk");
@@ -41,6 +44,7 @@ public class ShadowUnlock
 		this.description = "Unlock Description";
 		this.consumable = 0;
 		this.singleton = 1;
+		this.rarity = 1;
 	}
 
 	public String getId()
@@ -111,5 +115,15 @@ public class ShadowUnlock
 	public void setSingleton(boolean singleton)
 	{
 		this.singleton = (byte) (singleton ? 1 : 0);
+	}
+
+	public int getRarity()
+	{
+		return rarity;
+	}
+
+	public void setRarity(int rarity)
+	{
+		this.rarity = rarity;
 	}
 }

@@ -27,7 +27,7 @@ public class SMBots extends ShadeModule
 	public static boolean enabled = true;
 
 	@Key("on-join.movement-required-to-talk")
-	public static double distanceRequired = 5.5;
+	public static double distanceRequired = 3.5;
 
 	@Permission
 	public static PermissionShade perm;
