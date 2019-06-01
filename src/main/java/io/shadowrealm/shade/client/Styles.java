@@ -58,7 +58,7 @@ public class Styles
 
 	public static void soundChatReceive(Player i)
 	{
-		new Audio().s(Sound.ENTITY_CHICKEN_STEP).vp(0.17f, 0.1f).play(i);
+		new Audio().s(Sound.ENTITY_CHICKEN_STEP).vp(0.5f, 0.2f).play(i);
 	}
 
 	public static void cleared(Player i, String who)
