@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessConnector;
+import io.shadowrealm.shade.common.Statistics;
 import io.shadowrealm.shade.common.messages.RAccount;
 import io.shadowrealm.shade.common.messages.RCycleData;
 import io.shadowrealm.shade.common.messages.RError;
@@ -19,6 +20,7 @@ import io.shadowrealm.shade.common.messages.RGiveSXP;
 import io.shadowrealm.shade.common.messages.RLoggedIn;
 import io.shadowrealm.shade.common.messages.RRanks;
 import io.shadowrealm.shade.common.messages.RSXPChanged;
+import io.shadowrealm.shade.common.messages.RSetStatistics;
 import io.shadowrealm.shade.common.messages.RStateChanged;
 import io.shadowrealm.shade.common.messages.RUnlocks;
 import io.shadowrealm.shade.common.table.ShadowAccount;
@@ -36,6 +38,7 @@ import mortar.util.text.D;
 
 public class ShadowPlayerController extends Controller
 {
+	private GMap<Player, Statistics> stats;
 	private GMap<Player, ShadowAccount> shadows;
 	private GList<ShadowRank> ranks;
 	private GList<ShadowUnlock> unlocks;
@@ -56,6 +59,7 @@ public class ShadowPlayerController extends Controller
 			return;
 		}
 
+		stats = new GMap<>();
 		latch = new ChronoLatch(10000);
 		online = 0;
 		tagline = "";
@@ -71,6 +75,7 @@ public class ShadowPlayerController extends Controller
 		});
 		new RGetCycleData().complete(ShadeClient.instance.getConnector(), (r) -> cycleInterval = ((RCycleData) r).cycle());
 		J.ar(() -> updateState(), 20 * 2);
+		J.ar(() -> syncronizeStatistics(), 6000);
 		J.s(() -> status = "&aOnline", 100);
 		J.s(() -> since = M.ms(), 100);
 	}
@@ -105,6 +110,13 @@ public class ShadowPlayerController extends Controller
 	@Override
 	public void stop()
 	{
+		syncronizeStatistics();
+
+		for(Player i : shadows.k())
+		{
+			quit(i);
+		}
+
 		lastState.setStatus("&cRestarting");
 		lastState.setSince(M.ms());
 		lastState.setOnline(0);
@@ -194,8 +206,7 @@ public class ShadowPlayerController extends Controller
 			return;
 		}
 
-		quit(e.getPlayer());
-
+		J.a(() -> quit(e.getPlayer()));
 	}
 
 	public ShadowAccount getAccount(Player player)
@@ -232,9 +243,32 @@ public class ShadowPlayerController extends Controller
 		//@done
 	}
 
+	public void syncronizeStatistics()
+	{
+		for(Player i : stats.k())
+		{
+			syncronizeStatistics(i);
+		}
+	}
+
+	private void syncronizeStatistics(Player i)
+	{
+		if(getAccount(i).getStatistics().equals(getStats(i)))
+		{
+			stats.remove(i);
+			return;
+		}
+
+		getAccount(i).setStatistics(getStats(i));
+		new RSetStatistics().player(i.getUniqueId()).statistics(getStats(i).toString()).complete(Shade.connect());
+		stats.remove(i);
+	}
+
 	private void quit(Player player)
 	{
+		syncronizeStatistics(player);
 		shadows.remove(player);
+		stats.remove(player);
 	}
 
 	private void join(Player player, ShadowAccount shadowAccount)
@@ -298,4 +332,13 @@ public class ShadowPlayerController extends Controller
 		return latch;
 	}
 
+	public Statistics getStats(Player p)
+	{
+		if(!stats.containsKey(p))
+		{
+			stats.put(p, getAccount(p).getStatistics());
+		}
+
+		return stats.get(p);
+	}
 }

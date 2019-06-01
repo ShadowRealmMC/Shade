@@ -3,6 +3,7 @@ package io.shadowrealm.shade.common.table;
 import java.util.Map;
 import java.util.UUID;
 
+import io.shadowrealm.shade.common.Statistics;
 import io.shadowrealm.shade.common.UnlockedItem;
 import mortar.api.sql.Column;
 import mortar.api.sql.Table;
@@ -31,6 +32,9 @@ public class ShadowAccount
 
 	@Column(name = "settings", type = "TEXT", placeholder = "")
 	private String settings;
+
+	@Column(name = "statistics", type = "TEXT", placeholder = "")
+	private String statistics;
 
 	@Column(name = "last_cycle", type = "BIGINT", placeholder = "0")
 	private long lastCycle;
@@ -63,6 +67,8 @@ public class ShadowAccount
 		this.amethyst = 0;
 		this.lastCycle = 0;
 		this.unlocks = "";
+		this.statistics = "";
+		this.settings = "";
 	}
 
 	public long getLastCycle()
@@ -243,5 +249,20 @@ public class ShadowAccount
 	public void setSettings(String settings)
 	{
 		this.settings = settings;
+	}
+
+	public Statistics getStatistics()
+	{
+		return new Statistics().fill(statistics);
+	}
+
+	public void setStatistics(Statistics s)
+	{
+		statistics = s.toString();
+	}
+
+	public void setStatistics(String s)
+	{
+		statistics = s;
 	}
 }

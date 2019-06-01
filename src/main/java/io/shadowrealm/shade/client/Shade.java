@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessConnector;
+import io.shadowrealm.shade.common.Statistics;
 import io.shadowrealm.shade.common.UnlockedItem;
 import io.shadowrealm.shade.common.messages.RAccount;
 import io.shadowrealm.shade.common.messages.RError;
@@ -28,6 +29,11 @@ import mortar.util.text.C;
 public class Shade
 {
 	private static final GMap<String, ConnectableServer> servers = new GMap<>();
+
+	public static Statistics getStatistics(Player p)
+	{
+		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getStats(p);
+	}
 
 	public static ShadowAccount getAccount(Player id)
 	{
