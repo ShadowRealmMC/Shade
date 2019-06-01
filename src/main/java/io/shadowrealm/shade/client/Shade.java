@@ -20,9 +20,11 @@ import io.shadowrealm.shade.common.table.ShadowRank;
 import io.shadowrealm.shade.common.table.ShadowUnlock;
 import mortar.api.world.P;
 import mortar.bukkit.command.MortarSender;
+import mortar.bukkit.plugin.MortarAPIPlugin;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 import mortar.lang.json.JSONObject;
+import mortar.lib.control.MojangProfileController;
 import mortar.logic.format.F;
 import mortar.util.text.C;
 
@@ -33,6 +35,19 @@ public class Shade
 	public static Statistics getStatistics(Player p)
 	{
 		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getStats(p);
+	}
+
+	public static Statistics getStatistics(UUID p)
+	{
+		for(Player i : P.onlinePlayers())
+		{
+			if(i.getUniqueId().equals(p))
+			{
+				return getAccount(i).getStatistics();
+			}
+		}
+
+		return getAccount(p).getStatistics();
 	}
 
 	public static ShadowAccount getAccount(Player id)
@@ -192,5 +207,10 @@ public class Shade
 		{
 			Styles.superBorder(player, i + "Chat Color Changed to " + F.capitalizeWords(i.name().toLowerCase().replaceAll("_", " ")), i, C.DARK_GRAY);
 		}
+	}
+
+	public static UUID getUUID(String name)
+	{
+		return ((MojangProfileController) MortarAPIPlugin.p.getController(MojangProfileController.class)).getOnlineUUID(name);
 	}
 }
