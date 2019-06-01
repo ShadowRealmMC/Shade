@@ -9,6 +9,9 @@ public class PermissionShade extends MortarPermission
 	public PermissionChat chat;
 
 	@Permission
+	public PermissionStats stats;
+
+	@Permission
 	public PermissionUnlocks unlocks;
 
 	@Override
