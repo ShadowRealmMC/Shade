@@ -1,6 +1,5 @@
 package io.shadowrealm.shade.common.table;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -12,7 +11,6 @@ import mortar.api.sql.UniversalParser;
 import mortar.lang.collection.GMap;
 import mortar.lang.json.JSONException;
 import mortar.lang.json.JSONObject;
-import mortar.logic.io.Hasher;
 
 @Table("shadow_accounts")
 public class ShadowAccount
@@ -156,10 +154,10 @@ public class ShadowAccount
 	{
 		try
 		{
-			return new JSONObject(Hasher.decompress(settings));
+			return new JSONObject(settings);
 		}
 
-		catch(JSONException | IOException e)
+		catch(JSONException e)
 		{
 
 		}
@@ -171,10 +169,10 @@ public class ShadowAccount
 	{
 		try
 		{
-			settings = Hasher.compress(o.toString(0));
+			settings = o.toString(0);
 		}
 
-		catch(JSONException | IOException e)
+		catch(JSONException e)
 		{
 			e.printStackTrace();
 		}
@@ -190,7 +188,7 @@ public class ShadowAccount
 		try
 		{
 			GMap<String, UnlockedItem> items = new GMap<>();
-			JSONObject object = new JSONObject(Hasher.decompress(unlocks));
+			JSONObject object = new JSONObject(unlocks);
 
 			for(String i : object.keySet())
 			{
@@ -233,7 +231,7 @@ public class ShadowAccount
 
 		try
 		{
-			unlocks = Hasher.compress(o.toString(0));
+			unlocks = o.toString(0);
 		}
 
 		catch(Throwable e)
