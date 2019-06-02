@@ -41,6 +41,17 @@ public class Styles
 		//@done
 	}
 
+	public static void soundShout(Player i)
+	{
+		//@builder
+		new Audio()
+		.addChild(new Audio().s(Sound.ENTITY_SHULKER_BULLET_HIT).vp(0.3f, 1.31f))
+		.addChild(new MFADistortion(2, 1.9f)
+				.distort(new Audio().s(Sound.ENTITY_ITEMFRAME_ROTATE_ITEM).vp(1f, 0.85f)))
+		.play(i);
+		//@done
+	}
+
 	public static void soundTabComplete(Player i)
 	{
 		new Audio().s(Sound.ENTITY_ITEMFRAME_ROTATE_ITEM).vp(1.25f, 1.2f).play(i);
@@ -73,7 +84,13 @@ public class Styles
 
 	public static void superBorder(Player i, String message, C bright, C dark)
 	{
-		superHR(i, F.color(bright + "            \u2720 " + bright + "&l" + message + bright + " \u2720"), bright, dark, 6, 3);
+		superHR(i, F.color(bright + "            \u2720 " + bright + "&l" + message + bright + " \u2720"), bright, dark, 5, 3);
+	}
+
+	public static void superBorderShout(Player i, String message)
+	{
+		soundShout(i);
+		superHRSilent(i, F.color(C.GREEN + "            \u2720 " + C.GREEN + "&l" + message + C.GREEN + " \u2720"), C.GREEN, C.DARK_GREEN, 3, 2);
 	}
 
 	private static void superHR(Player i, String v, int height, int offset)
@@ -103,6 +120,11 @@ public class Styles
 	private static void superHR(Player i, String v, C bright, C dark, int height, int offset)
 	{
 		soundAlert(i);
+		superHRSilent(i, v, bright, dark, height, offset);
+	}
+
+	private static void superHRSilent(Player i, String v, C bright, C dark, int height, int offset)
+	{
 		for(int j = 0; j < height; j++)
 		{
 			if(j != height - offset)
@@ -127,7 +149,7 @@ public class Styles
 
 	private static void clearChatRaw(Player i, String mainline)
 	{
-		superHR(i, mainline, C.LIGHT_PURPLE, C.DARK_PURPLE, 120, 5);
+		superHR(i, mainline, C.YELLOW, C.GOLD, 120, 5);
 	}
 
 	public static void superBorderRGB(Player i, String message)

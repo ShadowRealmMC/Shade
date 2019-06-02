@@ -1,10 +1,8 @@
 package io.shadowrealm.shade.client.command;
 
-import org.bukkit.entity.Player;
-
+import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.ShadeClient;
-import io.shadowrealm.shade.client.Styles;
-import mortar.api.world.P;
+import io.shadowrealm.shade.common.messages.RBroadcastLarge;
 import mortar.bukkit.command.MortarCommand;
 import mortar.bukkit.command.MortarSender;
 import mortar.logic.format.F;
@@ -28,10 +26,9 @@ public class CommandChatSuperBroadcast extends MortarCommand
 			m += i + " ";
 		}
 
-		for(Player i : P.onlinePlayers())
-		{
-			Styles.superBorder(i, F.color(m), C.YELLOW, C.GOLD);
-		}
+		C bright = C.LIGHT_PURPLE;
+		C dark = C.DARK_PURPLE;
+		new RBroadcastLarge().message(F.color(m)).colorBright(bright).colorDark(dark).completeBlind(Shade.connect());
 
 		return true;
 	}
