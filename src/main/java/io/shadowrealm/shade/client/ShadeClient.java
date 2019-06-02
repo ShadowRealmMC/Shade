@@ -160,7 +160,16 @@ public class ShadeClient extends MortarPlugin
 	@Override
 	public void stop()
 	{
+		try
+		{
+			server.stop();
+			server.join();
+		}
 
+		catch(Throwable e)
+		{
+
+		}
 	}
 
 	@Override
