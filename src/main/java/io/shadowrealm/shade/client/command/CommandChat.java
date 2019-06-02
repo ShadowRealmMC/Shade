@@ -41,7 +41,7 @@ public class CommandChat extends MortarCommand
 
 		if(ShadeClient.perm.chat.broadcast.has(sender))
 		{
-			sender.sendMessage("/chat broadcast [msg]" + C.DARK_PURPLE + " - Show a supersized broadcast");
+			sender.sendMessage("/chat broadcast [msg]" + C.DARK_PURPLE + " - Show a broadcast");
 		}
 
 		if(ShadeClient.perm.chat.changeColor.has(sender))

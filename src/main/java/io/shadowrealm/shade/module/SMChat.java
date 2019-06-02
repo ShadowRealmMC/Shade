@@ -12,6 +12,7 @@ import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.ShadeClient;
 import io.shadowrealm.shade.client.Styles;
 import io.shadowrealm.shade.client.command.CommandChat;
+import io.shadowrealm.shade.client.command.CommandShout;
 import io.shadowrealm.shade.module.api.ShadeModule;
 import mortar.api.config.Key;
 import mortar.api.sched.J;
@@ -72,6 +73,7 @@ public class SMChat extends ShadeModule
 	{
 		l("Registering Chat Commands");
 		registerCommand(new CommandChat());
+		registerCommand(new CommandShout());
 		averageChatFrequency = new GMap<>();
 		chatFrequency = new GMap<>();
 		J.ar(() -> updateChatDelays(), delayInterval);
