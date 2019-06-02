@@ -160,6 +160,9 @@ public class OSQL
 
 		// Special FX
 		generateUnlock("deathfx:death_wither", false, true, "Wither Death Effect", "When you die, you wither away into black particles.", 525);
+
+		// Shouts
+		generateUnlock("attention:shout", true, false, "Shout", "Use /shout <message> to shout across every server.", 450);
 	}
 
 	public void generateUnlock(String cid, boolean consumable, boolean singleton, String name, String description, int rarity) throws SQLException
