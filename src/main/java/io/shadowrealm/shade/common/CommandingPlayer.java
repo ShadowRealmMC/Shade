@@ -76,6 +76,7 @@ public class CommandingPlayer implements Listener
 
 				if(!e.isCancelled())
 				{
+					Bukkit.dispatchCommand(p, delayedCommand.substring(1));
 					Styles.soundCommandSend(p);
 					p.sendMessage(C.GRAY + "Ran " + C.WHITE + delayedCommand);
 				}
