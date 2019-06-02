@@ -74,7 +74,7 @@ public class ShadowPlayerController extends Controller
 			l("Unlocks" + unlocks.size());
 		});
 		new RGetCycleData().complete(ShadeClient.instance.getConnector(), (r) -> cycleInterval = ((RCycleData) r).cycle());
-		J.ar(() -> updateState(), 20 * 2);
+		J.ar(() -> updateState(), 20 * 30);
 		J.ar(() -> syncronizeStatistics(), 6000);
 		J.s(() -> status = "&aOnline", 100);
 		J.s(() -> since = M.ms(), 100);
@@ -251,7 +251,7 @@ public class ShadowPlayerController extends Controller
 		}
 	}
 
-	private void syncronizeStatistics(Player i)
+	public void syncronizeStatistics(Player i)
 	{
 		if(getAccount(i).getStatistics().equals(getStats(i)))
 		{

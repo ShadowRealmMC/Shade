@@ -11,7 +11,6 @@ import org.bukkit.inventory.meta.BookMeta.Generation;
 
 import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.ShadeClient;
-import io.shadowrealm.shade.common.Statistics;
 import mortar.api.world.P;
 import mortar.bukkit.command.MortarCommand;
 import mortar.bukkit.command.MortarSender;
@@ -55,42 +54,44 @@ public class CommandStats extends MortarCommand
 			return true;
 		}
 
-		Statistics s = Shade.getStatistics(id);
-		ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
-		BookMeta bm = (BookMeta) is.getItemMeta();
-		bm.setTitle(name + "'s Statistics");
-		GList<String> pages = new GList<String>();
-		bm.setAuthor("ShadowRealm");
-		int m = 0;
-		StringBuilder buffer = new StringBuilder();
-
-		for(String i : s.k())
+		Shade.getStatisticsSynced(id, (s) ->
 		{
-			buffer.append(ChatColor.BLACK + "" + ChatColor.BOLD + i + ": \n" + ChatColor.DARK_GRAY + F.f(s.get(i).longValue()));
+			ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
+			BookMeta bm = (BookMeta) is.getItemMeta();
+			bm.setTitle(name + "'s Statistics");
+			GList<String> pages = new GList<String>();
+			bm.setAuthor("ShadowRealm");
+			int m = 0;
+			StringBuilder buffer = new StringBuilder();
 
-			if(m < 3)
+			for(String i : s.k())
 			{
-				buffer.append("\n\n");
-				m++;
+				buffer.append(ChatColor.BLACK + "" + ChatColor.BOLD + i + ": \n" + ChatColor.DARK_GRAY + F.f(s.get(i).longValue()));
+
+				if(m < 3)
+				{
+					buffer.append("\n\n");
+					m++;
+				}
+
+				else
+				{
+					pages.add(buffer.toString());
+					buffer = new StringBuilder();
+					m = 0;
+				}
 			}
 
-			else
+			if(m > 0)
 			{
 				pages.add(buffer.toString());
-				buffer = new StringBuilder();
-				m = 0;
 			}
-		}
 
-		if(m > 0)
-		{
-			pages.add(buffer.toString());
-		}
-
-		bm.setGeneration(Generation.TATTERED);
-		bm.setPages(pages);
-		is.setItemMeta(bm);
-		sender.player().getInventory().addItem(is);
+			bm.setGeneration(Generation.TATTERED);
+			bm.setPages(pages);
+			is.setItemMeta(bm);
+			sender.player().getInventory().addItem(is);
+		});
 
 		return true;
 	}

@@ -18,9 +18,11 @@ import io.shadowrealm.shade.common.messages.RUnlock;
 import io.shadowrealm.shade.common.table.ShadowAccount;
 import io.shadowrealm.shade.common.table.ShadowRank;
 import io.shadowrealm.shade.common.table.ShadowUnlock;
+import mortar.api.sched.J;
 import mortar.api.world.P;
 import mortar.bukkit.command.MortarSender;
 import mortar.bukkit.plugin.MortarAPIPlugin;
+import mortar.lang.collection.Callback;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 import mortar.lang.json.JSONObject;
@@ -37,6 +39,15 @@ public class Shade
 		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getStats(p);
 	}
 
+	public static void syncronizeStatistics(Player p, Callback<Statistics> stats)
+	{
+		J.a(() ->
+		{
+			((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).syncronizeStatistics(p);
+			stats.run(getStatistics(p));
+		});
+	}
+
 	public static Statistics getStatistics(UUID p)
 	{
 		for(Player i : P.onlinePlayers())
@@ -48,6 +59,20 @@ public class Shade
 		}
 
 		return getAccount(p).getStatistics();
+	}
+
+	public static void getStatisticsSynced(UUID p, Callback<Statistics> s)
+	{
+		for(Player i : P.onlinePlayers())
+		{
+			if(i.getUniqueId().equals(p))
+			{
+				syncronizeStatistics(i, (v) -> s.run(v));
+				return;
+			}
+		}
+
+		s.run(getAccount(p).getStatistics());
 	}
 
 	public static ShadowAccount getAccount(Player id)
