@@ -4,6 +4,7 @@ import mortar.lang.collection.GList;
 
 public class ServerConfig
 {
+	public static long SHOUTING_INTERVAL = 10000;
 	public static long RANKING__CYCLE_TIME__VALUE = 1;
 	public static String RANKING__CYCLE_TIME__UNIT = "DAYS";
 	public static double RANKING__OVERBLEED = 0.25;
