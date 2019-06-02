@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessConnector;
@@ -237,5 +238,15 @@ public class Shade
 	public static UUID getUUID(String name)
 	{
 		return ((MojangProfileController) MortarAPIPlugin.p.getController(MojangProfileController.class)).getOnlineUUID(name);
+	}
+
+	public static void listen(Listener l)
+	{
+		MortarAPIPlugin.p.registerListener(l);
+	}
+
+	public static void unlisten(Listener l)
+	{
+		MortarAPIPlugin.p.unregisterListener(l);
 	}
 }
