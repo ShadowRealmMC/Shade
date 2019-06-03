@@ -34,6 +34,20 @@ public class RestlessConnector
 		this.who = who;
 	}
 
+	public void flushAndDie()
+	{
+		try
+		{
+			service.shutdown();
+			service.awaitTermination(2, TimeUnit.SECONDS);
+		}
+
+		catch(Throwable e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	public void queue(Runnable r)
 	{
 		service.submit(r);
