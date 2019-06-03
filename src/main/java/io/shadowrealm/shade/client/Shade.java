@@ -15,6 +15,7 @@ import io.shadowrealm.shade.common.messages.RAccount;
 import io.shadowrealm.shade.common.messages.RError;
 import io.shadowrealm.shade.common.messages.RGetAccount;
 import io.shadowrealm.shade.common.messages.ROK;
+import io.shadowrealm.shade.common.messages.RScheduleReboot;
 import io.shadowrealm.shade.common.messages.RSetSettings;
 import io.shadowrealm.shade.common.messages.RSpendUnlock;
 import io.shadowrealm.shade.common.messages.RUnlock;
@@ -25,6 +26,7 @@ import mortar.api.sched.J;
 import mortar.api.world.P;
 import mortar.bukkit.command.MortarSender;
 import mortar.bukkit.plugin.MortarAPIPlugin;
+import mortar.compute.math.M;
 import mortar.lang.collection.Callback;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
@@ -36,6 +38,77 @@ import mortar.util.text.C;
 public class Shade
 {
 	private static final GMap<String, ConnectableServer> servers = new GMap<>();
+
+	/**
+	 * Get the total amount of shadow xp the player has ever earned
+	 *
+	 * @param player
+	 *            the player
+	 * @return the total xp
+	 */
+	public static long getTotalShadowXPEarned(Player player)
+	{
+		return getAccount(player).getShadowXP();
+	}
+
+	/**
+	 * Get the total amount of shadow xp the player has ever earned
+	 *
+	 * @param player
+	 *            the player
+	 * @return the total xp
+	 */
+	public static long getTotalShadowXPEarned(UUID player)
+	{
+		return getAccount(player).getShadowXP();
+	}
+
+	/**
+	 * Compute the player's rank based on SXP
+	 *
+	 * @param player
+	 *            the player
+	 * @return the shadow rank
+	 */
+	public static ShadowRank computeRank(Player player)
+	{
+		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).computeRank(getAccount(player));
+	}
+
+	/**
+	 * Compute the player's rank based on SXP
+	 *
+	 * @param player
+	 *            the player
+	 * @return the shadow rank
+	 */
+	public static ShadowRank computeRank(UUID player)
+	{
+		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).computeRank(getAccount(player));
+	}
+
+	/**
+	 * Schedules a network organized reboot to the proxy
+	 *
+	 * @param inMillisecondsUntilReboot
+	 *            the amount of milliseconds before the reboot. Overwrites the
+	 *            previous scheduled reboot.
+	 */
+	public static void scheduleNetworkReboot(long inMillisecondsUntilReboot)
+	{
+		new RScheduleReboot().in(inMillisecondsUntilReboot).completeBlind(Shade.connect());
+	}
+
+	/**
+	 * The proxy auto-schedules reboots for servers. This is the next scheduled time
+	 * for the proxy
+	 *
+	 * @return if the value is negative, there is no scheduled reboot
+	 */
+	public static long getTimeUntilReboot()
+	{
+		return ShadeClient.rebootSchedule - M.ms();
+	}
 
 	/**
 	 * Call this async as it runs netcode on the run thread. Check the return
