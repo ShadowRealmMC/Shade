@@ -17,6 +17,9 @@ public class PermissionShade extends MortarPermission
 	@Permission
 	public PermissionReboot reboot;
 
+	@Permission
+	public PermissionBooster booster;
+
 	@Override
 	protected String getNode()
 	{
