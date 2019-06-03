@@ -25,6 +25,31 @@ public class ServerEffects
 		effects = new ArrayList<ServerEffect>();
 	}
 
+	public long getTimeMSLeft(String id)
+	{
+		ServerEffect e = get(id);
+
+		return e != null ? (e.getEndsAt() - M.ms()) : -1;
+	}
+
+	public boolean has(String id)
+	{
+		return get(id) != null;
+	}
+
+	public ServerEffect get(String id)
+	{
+		for(ServerEffect i : effects)
+		{
+			if(i.getId().equals(id) || (id.contains(":") && id.split(":")[1].equals(i.getId())))
+			{
+				return i;
+			}
+		}
+
+		return null;
+	}
+
 	public void addAll(long time)
 	{
 		for(ServerEffect i : effects)
@@ -64,25 +89,25 @@ public class ServerEffects
 		save();
 		return true;
 	}
-	
+
 	public static ServerEffects load()
 	{
 		File f = new File(ShadeServer.instance.getDataFolder(), "active-effects.json");
 		f.getParentFile().mkdirs();
-		
+
 		if(f.exists())
 		{
 			try
 			{
 				return UniversalParser.fromJSON(new JSONObject(VIO.readAll(f)), ServerEffects.class);
 			}
-			
+
 			catch(Throwable e)
 			{
 				e.printStackTrace();
 			}
 		}
-		
+
 		return null;
 	}
 

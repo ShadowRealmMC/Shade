@@ -17,6 +17,7 @@ import mortar.lang.json.JSONObject;
 public class ShadowAccount
 {
 	public static final TableCache<UUID, ShadowAccount> CACHE = new TableCache<UUID, ShadowAccount>(1024);
+	public static final TableCache<UUID, Map<String, UnlockedItem>> UNLOCK_CACHE = new TableCache<UUID, Map<String, UnlockedItem>>(512);
 
 	@Column(name = "id", type = "VARCHAR(36)", placeholder = "<ERROR: UNDEFINED>", primary = true)
 	private UUID id;
@@ -191,6 +192,11 @@ public class ShadowAccount
 			return new GMap<>();
 		}
 
+		if(UNLOCK_CACHE.has(id))
+		{
+			return UNLOCK_CACHE.get(id);
+		}
+
 		try
 		{
 			GMap<String, UnlockedItem> items = new GMap<>();
@@ -209,6 +215,7 @@ public class ShadowAccount
 				}
 			}
 
+			UNLOCK_CACHE.put(id, new GMap<>(items));
 			return items;
 		}
 
@@ -238,6 +245,7 @@ public class ShadowAccount
 		try
 		{
 			unlocks = o.toString(0);
+			UNLOCK_CACHE.put(id, new GMap<>(items));
 		}
 
 		catch(Throwable e)
@@ -264,5 +272,15 @@ public class ShadowAccount
 	public void setStatistics(String s)
 	{
 		statistics = s;
+	}
+
+	public UnlockedItem getUnlock(String id)
+	{
+		return hasUnlock(id) ? getUnlocks().get(id.contains(":") ? id.split(":")[1] : id) : null;
+	}
+
+	public boolean hasUnlock(String id)
+	{
+		return getUnlocks().containsKey(id.contains(":") ? id.split(":")[1] : id);
 	}
 }

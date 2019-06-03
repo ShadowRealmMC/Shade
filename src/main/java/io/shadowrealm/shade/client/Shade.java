@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 
 import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessConnector;
+import io.shadowrealm.shade.common.RestlessObject;
 import io.shadowrealm.shade.common.Statistics;
 import io.shadowrealm.shade.common.UnlockedItem;
 import io.shadowrealm.shade.common.messages.RAccount;
@@ -15,6 +16,7 @@ import io.shadowrealm.shade.common.messages.RError;
 import io.shadowrealm.shade.common.messages.RGetAccount;
 import io.shadowrealm.shade.common.messages.ROK;
 import io.shadowrealm.shade.common.messages.RSetSettings;
+import io.shadowrealm.shade.common.messages.RSpendUnlock;
 import io.shadowrealm.shade.common.messages.RUnlock;
 import io.shadowrealm.shade.common.table.ShadowAccount;
 import io.shadowrealm.shade.common.table.ShadowRank;
@@ -34,6 +36,70 @@ import mortar.util.text.C;
 public class Shade
 {
 	private static final GMap<String, ConnectableServer> servers = new GMap<>();
+
+	/**
+	 * Call this async as it runs netcode on the run thread. Check the return
+	 * result. The proxy may deny you for several reasons, do not give the reward if
+	 * it returns false, this will desync the player's account from the network
+	 *
+	 * @param p
+	 *            the player
+	 * @param id
+	 *            the unlock id
+	 * @return true if the proxy has accepted this transaction
+	 */
+	public static boolean consumeUnlock(Player p, String id)
+	{
+		if(!getUnlock(id).isConsumable())
+		{
+			return false;
+		}
+
+		UnlockedItem item = getUnlock(p, id);
+
+		if(item == null)
+		{
+			return false;
+		}
+
+		RestlessObject res = new RSpendUnlock().player(p.getUniqueId()).unlock(id.contains(":") ? id.split(":")[1] : id).complete(Shade.connect());
+		if(res != null && res instanceof ROK)
+		{
+			Map<String, UnlockedItem> items = getAccount(p).getUnlocks();
+			UnlockedItem t = items.get("shout");
+			t.setAmount(t.getAmount() - 1);
+
+			if(t.getAmount() > 0)
+			{
+				items.put(id.contains(":") ? id.split(":")[1] : id, t);
+			}
+
+			else
+			{
+				items.remove(id.contains(":") ? id.split(":")[1] : id);
+			}
+
+			getAccount(p).setUnlocks(items);
+			return true;
+		}
+
+		return false;
+	}
+
+	public static int getUnlockAmount(Player p, String id)
+	{
+		return getUnlock(p, id).getAmount();
+	}
+
+	public static UnlockedItem getUnlock(Player p, String id)
+	{
+		return getAccount(p).getUnlock(id);
+	}
+
+	public static boolean hasUnlock(Player p, String id)
+	{
+		return getAccount(p).hasUnlock(id);
+	}
 
 	public static Statistics getStatistics(Player p)
 	{
