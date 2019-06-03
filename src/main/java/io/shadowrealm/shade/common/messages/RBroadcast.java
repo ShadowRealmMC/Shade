@@ -11,15 +11,16 @@ import io.shadowrealm.shade.server.ShadeServer;
 import mortar.api.world.P;
 import mortar.util.text.C;
 
-public class RBroadcastLarge extends RestlessObject
+public class RBroadcast extends RestlessObject
 {
 	private String message;
 	private String colorBright;
 	private String colorDark;
+	private String type;
 
-	public RBroadcastLarge()
+	public RBroadcast()
 	{
-
+		type = "";
 	}
 
 	@Override
@@ -37,7 +38,20 @@ public class RBroadcastLarge extends RestlessObject
 		{
 			for(Player i : P.onlinePlayers())
 			{
-				Styles.superBorder(i, message(), colorBright(), colorDark());
+				if(type.equals("toast"))
+				{
+					Styles.toastBroadcast(i, colorBright() + message());
+				}
+
+				else if(type.equals("chat"))
+				{
+					Styles.chatBroadcast(i, colorBright() + message());
+				}
+
+				else
+				{
+					Styles.superBorder(i, message(), colorBright(), colorDark());
+				}
 			}
 		}
 
@@ -49,7 +63,7 @@ public class RBroadcastLarge extends RestlessObject
 		return C.valueOf(colorBright);
 	}
 
-	public RBroadcastLarge colorBright(C colorBright)
+	public RBroadcast colorBright(C colorBright)
 	{
 		this.colorBright = colorBright.name();
 		return this;
@@ -60,7 +74,7 @@ public class RBroadcastLarge extends RestlessObject
 		return C.valueOf(colorDark);
 	}
 
-	public RBroadcastLarge colorDark(C colorDark)
+	public RBroadcast colorDark(C colorDark)
 	{
 		this.colorDark = colorDark.name();
 		return this;
@@ -71,9 +85,20 @@ public class RBroadcastLarge extends RestlessObject
 		return message;
 	}
 
-	public RBroadcastLarge message(String message)
+	public RBroadcast message(String message)
 	{
 		this.message = message;
+		return this;
+	}
+
+	public String type()
+	{
+		return type;
+	}
+
+	public RBroadcast type(String type)
+	{
+		this.type = type;
 		return this;
 	}
 }
