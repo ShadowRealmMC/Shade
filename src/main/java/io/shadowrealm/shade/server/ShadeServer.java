@@ -387,6 +387,7 @@ public class ShadeServer extends Plugin implements Listener
 	public void updateServerEffects(ServerEffects effects, ServerEffect added, String name, String bname)
 	{
 		this.effects = effects;
+		effects.save();
 		getProxy().getScheduler().schedule(this, () -> broadcastServerEffects(), 250, TimeUnit.MILLISECONDS);
 		broadcastServerEffects();
 		for(VirtualServer i : getServers().v())
