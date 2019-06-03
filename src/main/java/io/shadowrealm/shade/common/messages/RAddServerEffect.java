@@ -1,6 +1,5 @@
 package io.shadowrealm.shade.common.messages;
 
-import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.common.RestlessObject;
 import io.shadowrealm.shade.common.ServerEffect;
 import io.shadowrealm.shade.common.ServerEffects;
@@ -15,7 +14,7 @@ public class RAddServerEffect extends RestlessObject
 	@Override
 	public RestlessObject handle()
 	{
-		ShadeServer.instance.updateServerEffects(effects(), effect(), player(), Shade.getUnlock(effect.getId()).getFormattedName());
+		ShadeServer.instance.updateServerEffects(effects(), effect(), player(), ShadeServer.instance.getSQL().getUnlock(effect.getId()).getFormattedName());
 		return new ROK();
 	}
 
