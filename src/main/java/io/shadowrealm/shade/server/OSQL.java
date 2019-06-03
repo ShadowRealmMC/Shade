@@ -169,9 +169,9 @@ public class OSQL
 		generateUnlock("attention:shout", true, false, "Shout", "Use /shout <message> to shout across every server.", 450);
 
 		// Boosters
-		generateUnlockMeta("booster:the_skillful", true, false, "The Skillful", "Give every realm a boost. The Skillful booster increases xp drops, improves the rarity in drops across everyhing. Each realm is boosted in a way that will best affect their style of gameplay.", 7550, "{\"duration\":\15}");
-		generateUnlockMeta("booster:the_agile", true, false, "The Agile", "Give every realm a boost. The Agile booster turbocharges every realm, speeding up furnaces, hoppers, and reduces or removes cooldowns & delays for commands. You even move slightly faster in non-pvp areas. Each realm is boosted in a way that will best affect their style of gameplay.", 8150, "{\"duration\":\10}");
-		generateUnlockMeta("booster:the_phantom", true, false, "The Phantom", "Give every realm a boost. The Phantom booster grants flight, nightvision, in relevant areas. Each realm is boosted in a way that will best affect their style of gameplay.", 6820, "{\"duration\":\30}");
+		generateUnlockMeta("booster:the_skillful", true, false, "The Skillful", "Give every realm a boost. The Skillful booster increases xp drops, improves the rarity in drops across everyhing. Each realm is boosted in a way that will best affect their style of gameplay.", 7550, "{\"duration\":15}");
+		generateUnlockMeta("booster:the_agile", true, false, "The Agile", "Give every realm a boost. The Agile booster turbocharges every realm, speeding up furnaces, hoppers, and reduces or removes cooldowns & delays for commands. You even move slightly faster in non-pvp areas. Each realm is boosted in a way that will best affect their style of gameplay.", 8150, "{\"duration\":10}");
+		generateUnlockMeta("booster:the_phantom", true, false, "The Phantom", "Give every realm a boost. The Phantom booster grants flight, nightvision, in relevant areas. Each realm is boosted in a way that will best affect their style of gameplay.", 6820, "{\"duration\":30}");
 	}
 
 	public void generateUnlock(String cid, boolean consumable, boolean singleton, String name, String description, int rarity) throws SQLException
