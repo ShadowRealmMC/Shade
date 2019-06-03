@@ -4,6 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import io.shadowrealm.shade.client.command.CommandES;
 import io.shadowrealm.shade.common.CommandingPlayer;
 import io.shadowrealm.shade.module.api.ShadeModule;
 import mortar.api.config.Key;
@@ -40,6 +41,7 @@ public class SMCommands extends ShadeModule
 	@Override
 	public void start()
 	{
+		registerCommand(new CommandES());
 		J.ar(() -> tickPlayers(), 3);
 	}
 
