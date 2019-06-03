@@ -113,6 +113,11 @@ public class ServerEffects
 
 	public void save()
 	{
+		if(CommonProperties.SIDE == RestlessSide.CLIENT)
+		{
+			return;
+		}
+
 		File f = new File(ShadeServer.instance.getDataFolder(), "active-effects.json");
 		f.getParentFile().mkdirs();
 
