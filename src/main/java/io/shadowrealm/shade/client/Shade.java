@@ -14,6 +14,7 @@ import io.shadowrealm.shade.common.ServerEffects;
 import io.shadowrealm.shade.common.Statistics;
 import io.shadowrealm.shade.common.UnlockedItem;
 import io.shadowrealm.shade.common.messages.RAccount;
+import io.shadowrealm.shade.common.messages.RAddServerEffect;
 import io.shadowrealm.shade.common.messages.RError;
 import io.shadowrealm.shade.common.messages.RGetAccount;
 import io.shadowrealm.shade.common.messages.ROK;
@@ -41,6 +42,20 @@ public class Shade
 {
 	private static ServerEffects effects = new ServerEffects();
 	private static final GMap<String, ConnectableServer> servers = new GMap<>();
+
+	public static boolean activateBooster(Player p, ShadowUnlock u)
+	{
+		if(hasUnlock(p, u.getId()))
+		{
+			if(effects.addEffect(u, 1) && consumeUnlock(p, u.getId()))
+			{
+				new RAddServerEffect().effects(effects).effect(new ServerEffect(u.getId(), M.ms() + 10000)).player(p.getName()).completeBlind(connect());
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * Check if a booster is active

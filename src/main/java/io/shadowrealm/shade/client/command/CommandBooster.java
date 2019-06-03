@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.ShadeClient;
+import io.shadowrealm.shade.client.Styles;
 import io.shadowrealm.shade.common.UnlockedItem;
 import io.shadowrealm.shade.common.table.ShadowUnlock;
 import mortar.api.inventory.UIElement;
@@ -12,6 +13,7 @@ import mortar.api.inventory.UIPaneDecorator;
 import mortar.api.inventory.UIWindow;
 import mortar.api.inventory.Window;
 import mortar.api.inventory.WindowResolution;
+import mortar.api.sched.J;
 import mortar.api.world.MaterialBlock;
 import mortar.bukkit.command.MortarCommand;
 import mortar.bukkit.command.MortarSender;
@@ -78,6 +80,18 @@ public class CommandBooster extends MortarCommand
 	private void boost(Player player, String id)
 	{
 		player.closeInventory();
-		// TODO boost!
+
+		J.a(() ->
+		{
+			if(Shade.activateBooster(player, Shade.getUnlock(id)))
+			{
+				Styles.chatBroadcast(player, C.GRAY + "Activated Booster!");
+			}
+
+			else
+			{
+				Styles.chatBroadcast(player, C.GRAY + "Failed to activate booster for some reason...");
+			}
+		});
 	}
 }
