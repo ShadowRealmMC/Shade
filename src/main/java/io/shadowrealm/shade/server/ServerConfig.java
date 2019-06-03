@@ -4,6 +4,7 @@ import mortar.lang.collection.GList;
 
 public class ServerConfig
 {
+	public static int BOOSTERS__MAXIMUM_MINUTES = 240;
 	public static boolean AUTO_RESTART__ENABLED = true;
 	public static String AUTO_RESTART__TARGET_HOUR_EST = "3:30 AM";
 	public static long SHOUTING_INTERVAL = 10000;
