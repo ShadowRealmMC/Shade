@@ -62,7 +62,7 @@ public class ServerEffects
 
 	public boolean addEffect(ShadowUnlock u, int points)
 	{
-		JSONObject meta = new JSONObject();
+		JSONObject meta = new JSONObject(u.getMeta());
 		long timeAdd = points * meta.getInt("duration");
 
 		for(ServerEffect i : effects)
