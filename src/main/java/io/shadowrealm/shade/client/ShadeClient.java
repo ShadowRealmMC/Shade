@@ -26,6 +26,7 @@ import mortar.bukkit.plugin.Control;
 import mortar.bukkit.plugin.Instance;
 import mortar.bukkit.plugin.JarScannerSpecial;
 import mortar.bukkit.plugin.MortarPlugin;
+import mortar.compute.math.M;
 import mortar.util.text.C;
 import mortar.util.text.TXT;
 
@@ -34,6 +35,7 @@ public class ShadeClient extends MortarPlugin
 	public static boolean ready;
 	private Server server;
 	private RestlessConnector c;
+	public static long rebootSchedule = -1;
 
 	@Control
 	public ShadowPlayerController shadowPlayerController;
@@ -115,6 +117,7 @@ public class ShadeClient extends MortarPlugin
 			if(r != null && r instanceof RInitialized)
 			{
 				RInitialized init = (RInitialized) r;
+				rebootSchedule = init.rebootingAt() == -1 ? -1 : (M.ms() + init.rebootingAt());
 				server = new Server(init.port());
 				ServletContextHandler api = new ServletContextHandler(server, "/");
 				RestlessServlet rl = new RestlessServlet();
