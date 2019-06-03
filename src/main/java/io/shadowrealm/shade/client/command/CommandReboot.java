@@ -2,7 +2,6 @@ package io.shadowrealm.shade.client.command;
 
 import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.ShadeClient;
-import io.shadowrealm.shade.common.messages.RScheduleReboot;
 import mortar.bukkit.command.MortarCommand;
 import mortar.bukkit.command.MortarSender;
 import mortar.compute.math.M;
@@ -28,7 +27,7 @@ public class CommandReboot extends MortarCommand
 
 			else
 			{
-				sender.sendMessage("Reboot is scheduled for " + F.timeLong(ShadeClient.rebootSchedule - M.ms(), 0) + " from now.");
+				sender.sendMessage("Reboot is scheduled for " + F.timeLong(Shade.getTimeUntilReboot(), 0) + " from now.");
 			}
 
 			sender.sendMessage("/reboot <seconds|now>");
@@ -38,7 +37,8 @@ public class CommandReboot extends MortarCommand
 		{
 			if(args[0].toLowerCase().equals("now"))
 			{
-				new RScheduleReboot().in(0).completeBlind(Shade.connect());
+				Shade.scheduleNetworkReboot(0);
+				ShadeClient.rebootSchedule = M.ms() + (10000);
 				sender.sendMessage("Scheduled Reboot. Be Patient...");
 			}
 
@@ -47,7 +47,7 @@ public class CommandReboot extends MortarCommand
 				try
 				{
 					long v = Long.valueOf(args[0]);
-					new RScheduleReboot().in(v * 1000).completeBlind(Shade.connect());
+					Shade.scheduleNetworkReboot(v * 1000);
 					ShadeClient.rebootSchedule = M.ms() + (v * 1000);
 					sender.sendMessage("Reboot rescheduled for " + F.timeLong(ShadeClient.rebootSchedule - M.ms(), 0) + " from now.");
 				}
