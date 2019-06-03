@@ -86,26 +86,69 @@ public class Shade
 		return false;
 	}
 
+	/**
+	 * Get the current holdings a player has of a current unlock. Note that if the
+	 * unlock is a singleton, it will either return 1 or 0
+	 *
+	 * @param p
+	 *            the player
+	 * @param id
+	 *            the unlock id
+	 * @return returns the amount or 0 if they do not have the unlock
+	 */
 	public static int getUnlockAmount(Player p, String id)
 	{
-		return getUnlock(p, id).getAmount();
+		return hasUnlock(p, id) ? getUnlock(p, id).getAmount() : 0;
 	}
 
+	/**
+	 * Get the unlock item data associated with this player
+	 *
+	 * @param p
+	 *            the player
+	 * @param id
+	 *            the unlock id
+	 * @return the unlock or null if they do not have the unlock
+	 */
 	public static UnlockedItem getUnlock(Player p, String id)
 	{
 		return getAccount(p).getUnlock(id);
 	}
 
+	/**
+	 * Check if the player has the given unlock
+	 *
+	 * @param p
+	 *            the player
+	 * @param id
+	 *            the unlock id
+	 * @return true if the player has 1 or more of the given unlock
+	 */
 	public static boolean hasUnlock(Player p, String id)
 	{
 		return getAccount(p).hasUnlock(id);
 	}
 
+	/**
+	 * Get player statistics data
+	 *
+	 * @param p
+	 *            the player
+	 * @return the statistics wrapper
+	 */
 	public static Statistics getStatistics(Player p)
 	{
 		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getStats(p);
 	}
 
+	/**
+	 * Syncronize the player's statistics with the proxy (async forking task)
+	 *
+	 * @param p
+	 *            the player
+	 * @param stats
+	 *            the stats
+	 */
 	public static void syncronizeStatistics(Player p, Callback<Statistics> stats)
 	{
 		J.a(() ->
@@ -115,6 +158,14 @@ public class Shade
 		});
 	}
 
+	/**
+	 * Get statistics for any player. Will return empty statistics for a valid
+	 * mojang player.
+	 *
+	 * @param p
+	 *            the player's id
+	 * @return the statistics wrapper
+	 */
 	public static Statistics getStatistics(UUID p)
 	{
 		for(Player i : P.onlinePlayers())
@@ -128,6 +179,14 @@ public class Shade
 		return getAccount(p).getStatistics();
 	}
 
+	/**
+	 * Get syncronized statistics, forcing a sync before returning statistics
+	 *
+	 * @param p
+	 *            the player id
+	 * @param s
+	 *            the callback for the result
+	 */
 	public static void getStatisticsSynced(UUID p, Callback<Statistics> s)
 	{
 		for(Player i : P.onlinePlayers())
@@ -142,11 +201,27 @@ public class Shade
 		s.run(getAccount(p).getStatistics());
 	}
 
+	/**
+	 * Get the shadow account for any player. If the player does not have an
+	 * account, one will be created first then returned
+	 *
+	 * @param id
+	 *            the player
+	 * @return the account
+	 */
 	public static ShadowAccount getAccount(Player id)
 	{
 		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(id);
 	}
 
+	/**
+	 * Get the shadow account for any player. If the player does not have an
+	 * account, one will be created first then returned
+	 *
+	 * @param id
+	 *            the player's id
+	 * @return the account
+	 */
 	public static ShadowAccount getAccount(UUID id)
 	{
 		for(Player i : P.onlinePlayers())
@@ -160,6 +235,18 @@ public class Shade
 		return ((RAccount) new RGetAccount().player(id).complete(connect())).shadowAccount();
 	}
 
+	/**
+	 * Unlock an item for the given player
+	 *
+	 * @param sender
+	 *            the sender who is unlocking the item
+	 * @param playername
+	 *            the player's name
+	 * @param player
+	 *            the player id
+	 * @param item
+	 *            the item to unlock
+	 */
 	public static void unlock(MortarSender sender, String playername, UUID player, UnlockedItem item)
 	{
 		new RUnlock().player(player).unlock(item).complete(Shade.connect(), (r) ->
@@ -191,41 +278,93 @@ public class Shade
 		});
 	}
 
+	/**
+	 * Get a list of connectable servers with meta
+	 *
+	 * @return the live list
+	 */
 	public static GList<ConnectableServer> getServers()
 	{
 		return servers.v();
 	}
 
+	/**
+	 * Get a connectable server by id
+	 *
+	 * @param id
+	 *            the id
+	 * @return the server or null
+	 */
 	public static ConnectableServer getServer(String id)
 	{
 		return servers.get(id);
 	}
 
+	/**
+	 * Update this server's reference of another server (probably dont use this)
+	 *
+	 * @param i
+	 *            the server to update
+	 */
 	public static void updateServer(ConnectableServer i)
 	{
 		servers.put(i.getId(), i);
 	}
 
+	/**
+	 * Get all known unlock types from the proxy
+	 *
+	 * @return the unlocks
+	 */
 	public static GList<ShadowUnlock> getUnlocks()
 	{
 		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getUnlocks();
 	}
 
+	/**
+	 * Get a mapping of all unlocks from a player
+	 *
+	 * @param p
+	 *            the player
+	 * @return the unlocks
+	 */
 	public static Map<String, UnlockedItem> getUnlocks(Player p)
 	{
 		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(p).getUnlocks();
 	}
 
+	/**
+	 * Get the settings for the given player
+	 *
+	 * @param p
+	 *            the player
+	 * @return low level settings
+	 */
 	public static JSONObject getSettings(Player p)
 	{
 		return getAccount(p).getSettings();
 	}
 
+	/**
+	 * Get the settings for the given player
+	 *
+	 * @param p
+	 *            the player
+	 * @return low level settings
+	 */
 	public static JSONObject getSettings(UUID p)
 	{
 		return getAccount(p).getSettings();
 	}
 
+	/**
+	 * Set low level settings for the given player
+	 *
+	 * @param p
+	 *            the player
+	 * @param o
+	 *            the settings
+	 */
 	public static void setSettings(UUID p, JSONObject o)
 	{
 		for(Player i : P.onlinePlayers())
@@ -240,6 +379,13 @@ public class Shade
 		new RSetSettings().player(p).settings(o).completeBlind(connect());
 	}
 
+	/**
+	 * Get the unlock mapping for a given player
+	 *
+	 * @param p
+	 *            the player
+	 * @return the unlocks
+	 */
 	public static Map<String, UnlockedItem> getUnlocks(UUID p)
 	{
 		for(Player i : P.onlinePlayers())
@@ -253,11 +399,23 @@ public class Shade
 		return getAccount(p).getUnlocks();
 	}
 
+	/**
+	 * Get all known ranks
+	 *
+	 * @return the ranks synced by the proxy
+	 */
 	public static GList<ShadowRank> getRanks()
 	{
 		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getRanks();
 	}
 
+	/**
+	 * Get unlock information by id
+	 *
+	 * @param cid
+	 *            the id
+	 * @return the unlock data (table)
+	 */
 	public static ShadowUnlock getUnlock(String cid)
 	{
 		String category = cid.contains(":") ? cid.split("\\Q:\\E")[0] : "";
@@ -279,11 +437,24 @@ public class Shade
 		return null;
 	}
 
+	/**
+	 * Get the restless connection for sending messages to the proxy
+	 *
+	 * @return the restless (proxy) connection
+	 */
 	public static RestlessConnector connect()
 	{
 		return ShadeClient.instance.getConnector();
 	}
 
+	/**
+	 * Change a player's chat color
+	 *
+	 * @param i
+	 *            the color id (unlock)
+	 * @param player
+	 *            the player
+	 */
 	public static void changeChatColor(String i, Player player)
 	{
 		JSONObject o = getSettings(player).put("chat-color", i);
@@ -311,16 +482,36 @@ public class Shade
 		}
 	}
 
+	/**
+	 * Get a player's online UUID from mojang servers. These are cached, but be
+	 * careful to not get rate limited
+	 *
+	 * @param name
+	 *            the name
+	 * @return the UUID if found
+	 */
 	public static UUID getUUID(String name)
 	{
 		return ((MojangProfileController) MortarAPIPlugin.p.getController(MojangProfileController.class)).getOnlineUUID(name);
 	}
 
+	/**
+	 * Register a listener through mortar (for shade modules)
+	 *
+	 * @param l
+	 *            the listener
+	 */
 	public static void listen(Listener l)
 	{
 		MortarAPIPlugin.p.registerListener(l);
 	}
 
+	/**
+	 * Unregister a listener through mortar (for shade modules)
+	 *
+	 * @param l
+	 *            the listener
+	 */
 	public static void unlisten(Listener l)
 	{
 		MortarAPIPlugin.p.unregisterListener(l);
