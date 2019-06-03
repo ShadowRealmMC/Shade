@@ -14,6 +14,9 @@ public class PermissionShade extends MortarPermission
 	@Permission
 	public PermissionUnlocks unlocks;
 
+	@Permission
+	public PermissionReboot reboot;
+
 	@Override
 	protected String getNode()
 	{
