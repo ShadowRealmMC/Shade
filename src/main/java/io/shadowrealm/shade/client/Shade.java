@@ -9,6 +9,8 @@ import org.bukkit.event.Listener;
 import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessConnector;
 import io.shadowrealm.shade.common.RestlessObject;
+import io.shadowrealm.shade.common.ServerEffect;
+import io.shadowrealm.shade.common.ServerEffects;
 import io.shadowrealm.shade.common.Statistics;
 import io.shadowrealm.shade.common.UnlockedItem;
 import io.shadowrealm.shade.common.messages.RAccount;
@@ -37,7 +39,58 @@ import mortar.util.text.C;
 
 public class Shade
 {
+	private static ServerEffects effects = new ServerEffects();
 	private static final GMap<String, ConnectableServer> servers = new GMap<>();
+
+	/**
+	 * Check if a booster is active
+	 *
+	 * @param id
+	 *            the id of the booster
+	 * @return true if it is
+	 */
+	public static boolean isBoosterActive(String id)
+	{
+		for(ServerEffect i : effects.getEffects())
+		{
+			if(i.getId().equals(id))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get active booster time remaining ms
+	 *
+	 * @param id
+	 *            the booster
+	 * @return the time remaining or negative
+	 */
+	public static long getActiveBoosterTimeRemaining(String id)
+	{
+		for(ServerEffect i : effects.getEffects())
+		{
+			if(i.getId().equals(id))
+			{
+				return i.getEndsAt() - M.ms();
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get all active boosters
+	 *
+	 * @return the boosters
+	 */
+	public static GList<ServerEffect> getActiveBoosters()
+	{
+		return new GList<>(effects.getEffects());
+	}
 
 	/**
 	 * Get all unlocks by category
@@ -610,5 +663,16 @@ public class Shade
 	public static void unlisten(Listener l)
 	{
 		MortarAPIPlugin.p.unregisterListener(l);
+	}
+
+	/**
+	 * Update the servers effects
+	 *
+	 * @param effects
+	 *            the new effects
+	 */
+	public static void updateServerEffects(ServerEffects effects)
+	{
+		Shade.effects = effects;
 	}
 }
