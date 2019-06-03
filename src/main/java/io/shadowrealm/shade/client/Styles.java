@@ -32,12 +32,12 @@ public class Styles
 	public static void soundBroken(Player player)
 	{
 		new Audio().setSound(Sound.ITEM_SHIELD_BREAK).vp(1f, 1.3f).play(player);
-		new Audio().setSound(Sound.BLOCK_IRON_DOOR_CLOSE).vp(1f, 0.7f).play(player);
+		new Audio().setSound(Sound.BLOCK_IRON_DOOR_CLOSE).vp(1f, 0.6f).play(player);
 	}
 
 	public static void soundBreaking(Player player)
 	{
-		new Audio().setSound(Sound.BLOCK_IRON_DOOR_CLOSE).vp(0.67f, 0.1f).play(player);
+		new Audio().setSound(Sound.BLOCK_IRON_TRAPDOOR_CLOSE).vp(0.67f, 0.4f).play(player);
 	}
 
 	public static void soundAlert(Player i)
