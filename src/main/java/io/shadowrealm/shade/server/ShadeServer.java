@@ -392,7 +392,7 @@ public class ShadeServer extends Plugin implements Listener
 		broadcastServerEffects();
 		for(VirtualServer i : getServers().v())
 		{
-			new RBroadcast().colorBright(C.LIGHT_PURPLE).colorDark(C.DARK_PURPLE).message(name + " boosted ShadowRealms with \"" + bname + "\"").type("super").completeBlind(i.connector());
+			new RBroadcast().colorBright(C.LIGHT_PURPLE).colorDark(C.DARK_PURPLE).message(name + " used \"" + bname + "\"").type("super").completeBlind(i.connector());
 		}
 	}
 }
