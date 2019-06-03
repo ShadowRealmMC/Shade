@@ -4,6 +4,8 @@ import mortar.lang.collection.GList;
 
 public class ServerConfig
 {
+	public static boolean AUTO_RESTART__ENABLED = true;
+	public static String AUTO_RESTART__TARGET_HOUR_EST = "3:30 AM";
 	public static long SHOUTING_INTERVAL = 10000;
 	public static long RANKING__CYCLE_TIME__VALUE = 1;
 	public static String RANKING__CYCLE_TIME__UNIT = "DAYS";
