@@ -34,7 +34,7 @@ public class RInit extends RestlessObject
 					return new RError().message("Could not find an open port. Surry, but Furk U");
 				}
 
-				return new RInitialized().port(ports.get(serverID).getPort());
+				return new RInitialized().rebootingAt(ShadeServer.instance.getScheduledRebootTime()).port(ports.get(serverID).getPort());
 			}
 		}
 

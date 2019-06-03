@@ -4,6 +4,7 @@ import io.shadowrealm.shade.common.RestlessObject;
 
 public class RInitialized extends RestlessObject
 {
+	private long rebootingAt;
 	private int port;
 
 	@Override
@@ -20,6 +21,17 @@ public class RInitialized extends RestlessObject
 	public RInitialized port(int port)
 	{
 		this.port = port;
+		return this;
+	}
+
+	public long rebootingAt()
+	{
+		return rebootingAt;
+	}
+
+	public RInitialized rebootingAt(long rebootingAt)
+	{
+		this.rebootingAt = rebootingAt;
 		return this;
 	}
 }
