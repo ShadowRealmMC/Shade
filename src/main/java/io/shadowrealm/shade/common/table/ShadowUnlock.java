@@ -31,6 +31,9 @@ public class ShadowUnlock
 	@Column(name = "rarity", type = "INT", placeholder = "1")
 	private int rarity;
 
+	@Column(name = "meta", type = "TEXT", placeholder = "{}")
+	private String meta;
+
 	public ShadowUnlock()
 	{
 		this("idk");
@@ -125,5 +128,15 @@ public class ShadowUnlock
 	public void setRarity(int rarity)
 	{
 		this.rarity = rarity;
+	}
+
+	public String getMeta()
+	{
+		return meta;
+	}
+
+	public void setMeta(String meta)
+	{
+		this.meta = meta;
 	}
 }
