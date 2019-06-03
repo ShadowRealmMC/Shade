@@ -40,6 +40,28 @@ public class Shade
 	private static final GMap<String, ConnectableServer> servers = new GMap<>();
 
 	/**
+	 * Get all unlocks by category
+	 *
+	 * @param category
+	 *            the category
+	 * @return a list of unlocks. Or an empty list if the category doesnt exist
+	 */
+	public static GList<ShadowUnlock> getUnlocksForType(String category)
+	{
+		GList<ShadowUnlock> u = new GList<>();
+
+		for(ShadowUnlock i : getUnlocks())
+		{
+			if(i.getType().equals(category))
+			{
+				u.add(i);
+			}
+		}
+
+		return u;
+	}
+
+	/**
 	 * Get the total amount of shadow xp the player has ever earned
 	 *
 	 * @param player
