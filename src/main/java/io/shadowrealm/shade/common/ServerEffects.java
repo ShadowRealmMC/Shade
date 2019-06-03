@@ -108,7 +108,7 @@ public class ServerEffects
 			}
 		}
 
-		return null;
+		return new ServerEffects();
 	}
 
 	public void save()
