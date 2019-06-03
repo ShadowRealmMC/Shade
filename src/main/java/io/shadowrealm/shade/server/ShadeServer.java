@@ -4,7 +4,9 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.Servlet;
@@ -17,13 +19,18 @@ import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessServlet;
 import io.shadowrealm.shade.common.RestlessSide;
 import io.shadowrealm.shade.common.VirtualServer;
+import io.shadowrealm.shade.common.messages.RBroadcast;
 import io.shadowrealm.shade.common.messages.RKeepAlive;
 import io.shadowrealm.shade.common.messages.RKeptAlive;
+import io.shadowrealm.shade.common.messages.RReboot;
 import io.shadowrealm.shade.common.messages.RServerStateChanged;
 import mortar.api.config.Configurator;
+import mortar.compute.math.M;
 import mortar.lang.collection.GList;
 import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
+import mortar.util.text.C;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -31,8 +38,11 @@ import net.md_5.bungee.event.EventHandler;
 
 public class ShadeServer extends Plugin implements Listener
 {
+	private long rebootsIn;
 	private GMap<String, VirtualServer> serverPorts;
 	private Server server;
+	private Calendar scheduledTime;
+	private Calendar currentTime;
 	private OSQL osql;
 	public static ShadeServer instance;
 
@@ -40,6 +50,7 @@ public class ShadeServer extends Plugin implements Listener
 	public void onEnable()
 	{
 		instance = this;
+		rebootsIn = -1;
 		serverPorts = new GMap<>();
 		ServerConfig.PORT_OVERRIDES.copy();
 		Configurator.DEFAULT.load(ServerConfig.class, new File(getDataFolder(), "config.json"));
@@ -125,6 +136,105 @@ public class ShadeServer extends Plugin implements Listener
 				e.printStackTrace();
 			}
 		}).start();
+
+		if(ServerConfig.AUTO_RESTART__ENABLED)
+		{
+			scheduledTime = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
+			currentTime = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
+			int hourOfDayEST = Integer.valueOf(ServerConfig.AUTO_RESTART__TARGET_HOUR_EST.split(" ")[0].split(":")[0]);
+			int minuteOfHourEST = Integer.valueOf(ServerConfig.AUTO_RESTART__TARGET_HOUR_EST.split(" ")[0].split(":")[1]);
+			hourOfDayEST += ServerConfig.AUTO_RESTART__TARGET_HOUR_EST.split(" ")[1].toLowerCase().equals("pm") ? 12 : 0;
+			System.out.println("Auto Restart scheduled at " + ServerConfig.AUTO_RESTART__TARGET_HOUR_EST.toUpperCase());
+			scheduledTime.set(Calendar.HOUR_OF_DAY, hourOfDayEST);
+			scheduledTime.set(Calendar.MINUTE, minuteOfHourEST);
+
+			if(scheduledTime.getTimeInMillis() < currentTime.getTimeInMillis())
+			{
+				System.out.println("Scheduled time pushed back 1 calendar day, since the time for restart has already passed for today.");
+				scheduledTime.roll(Calendar.DAY_OF_YEAR, 1);
+			}
+
+			runAutoRestartThread();
+		}
+	}
+
+	private void runAutoRestartThread()
+	{
+		System.out.println("Restart Scheduled for " + (scheduledTime.get(Calendar.MONTH) + 1) + "/" + scheduledTime.get(Calendar.DAY_OF_MONTH) + " at " + ServerConfig.AUTO_RESTART__TARGET_HOUR_EST.toUpperCase());
+
+		new Thread(() ->
+		{
+			GMap<Long, String> warnings = new GMap<>();
+			warnings.put(5000L, "Restarting! Come back in a minute!");
+			warnings.put(30000L, "Restart in 30 seconds!");
+			warnings.put(60000L, "Restart in 1 minute!");
+			warnings.put(5 * 60000L, "Restart in 5 minutes!");
+			warnings.put(10 * 60000L, "Restart in 10 minutes!");
+			warnings.put(20 * 60000L, "Restart in 20 minutes!");
+			warnings.put(25 * 60000L, "Restart in 25 minutes!");
+			warnings.put(30 * 60000L, "Restart in 30 minutes!");
+
+			while(!Thread.interrupted())
+			{
+				try
+				{
+					currentTime.setTimeInMillis(M.ms());
+					Thread.sleep(1000);
+					long diff = Math.abs(scheduledTime.getTimeInMillis() - currentTime.getTimeInMillis());
+					rebootsIn = M.ms() + diff;
+
+					for(long i : warnings.k())
+					{
+						if(i > diff)
+						{
+							String warn = warnings.get(i);
+							warnings.remove(i);
+
+							if(diff < 10000)
+							{
+								for(VirtualServer j : serverPorts.v())
+								{
+									try
+									{
+										System.out.println("Stopping " + j.getName());
+										new RReboot().complete(j.connector());
+										j.connector().flushAndDie();
+									}
+
+									catch(Throwable e)
+									{
+
+									}
+								}
+
+								System.out.println("All servers should be rebooting.");
+								Thread.sleep(2000);
+								System.out.println("I'm Out.");
+								ProxyServer.getInstance().stop();
+							}
+
+							else
+							{
+								for(VirtualServer j : serverPorts.v())
+								{
+									new RBroadcast().colorBright(C.YELLOW).colorDark(C.GOLD).type(diff < 10000 ? "massive" : "toast").message(warn).completeBlind(j.connector());
+								}
+							}
+						}
+					}
+
+					if(diff > TimeUnit.HOURS.toMillis(1))
+					{
+						Thread.sleep(60000);
+					}
+				}
+
+				catch(Throwable e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 
 	public GMap<String, VirtualServer> getServers()
@@ -208,5 +318,54 @@ public class ShadeServer extends Plugin implements Listener
 		}
 
 		return false;
+	}
+
+	public long getScheduledRebootTime()
+	{
+		return rebootsIn;
+	}
+
+	public void rescheduleReboot(long time)
+	{
+		if(time == 0)
+		{
+			for(VirtualServer j : serverPorts.v())
+			{
+				try
+				{
+					System.out.println("Stopping " + j.getName());
+					new RReboot().complete(j.connector());
+					j.connector().flushAndDie();
+				}
+
+				catch(Throwable e)
+				{
+
+				}
+			}
+
+			System.out.println("All servers should be rebooting.");
+			try
+			{
+				Thread.sleep(2000);
+			}
+
+			catch(InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+			System.out.println("I'm Out.");
+			ProxyServer.getInstance().stop();
+		}
+
+		scheduledTime = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
+		Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
+		scheduledTime.setTimeInMillis(currentTime.getTimeInMillis() + time);
+
+		if(!ServerConfig.AUTO_RESTART__ENABLED)
+		{
+			ServerConfig.AUTO_RESTART__ENABLED = true;
+			runAutoRestartThread();
+		}
 	}
 }
