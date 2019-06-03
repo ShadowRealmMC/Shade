@@ -18,11 +18,14 @@ import io.shadowrealm.shade.common.CommonProperties;
 import io.shadowrealm.shade.common.ConnectableServer;
 import io.shadowrealm.shade.common.RestlessServlet;
 import io.shadowrealm.shade.common.RestlessSide;
+import io.shadowrealm.shade.common.ServerEffect;
+import io.shadowrealm.shade.common.ServerEffects;
 import io.shadowrealm.shade.common.VirtualServer;
 import io.shadowrealm.shade.common.messages.RBroadcast;
 import io.shadowrealm.shade.common.messages.RKeepAlive;
 import io.shadowrealm.shade.common.messages.RKeptAlive;
 import io.shadowrealm.shade.common.messages.RReboot;
+import io.shadowrealm.shade.common.messages.RServerEffects;
 import io.shadowrealm.shade.common.messages.RServerStateChanged;
 import mortar.api.config.Configurator;
 import mortar.compute.math.M;
@@ -41,6 +44,7 @@ public class ShadeServer extends Plugin implements Listener
 	private long rebootsIn;
 	private GMap<String, VirtualServer> serverPorts;
 	private Server server;
+	private ServerEffects effects;
 	private Calendar scheduledTime;
 	private Calendar currentTime;
 	private OSQL osql;
@@ -63,6 +67,8 @@ public class ShadeServer extends Plugin implements Listener
 		getLogger().info("Init Web Server");
 		RestlessServlet.who = "proxy";
 		RestlessServlet rl = new RestlessServlet();
+		getLogger().info("Loading Effects");
+		effects = ServerEffects.load();
 		getLogger().info("Registering API Servlet @/" + rl.getNode());
 		api.addServlet((Class<? extends Servlet>) rl.getClass(), "/" + rl.getNode());
 		getLogger().info("Processing Configuration");
@@ -271,10 +277,19 @@ public class ShadeServer extends Plugin implements Listener
 			if(k != null && k instanceof RKeptAlive)
 			{
 				System.out.println("Established Connection with " + serverID);
+				new RServerEffects().effects(effects).completeBlind(serverPorts.get(serverID).connector());
 			}
 		})
 		, 250, TimeUnit.MILLISECONDS);
 		//@done
+	}
+
+	public void broadcastServerEffects()
+	{
+		for(VirtualServer i : getServers().v())
+		{
+			new RServerEffects().effects(effects).completeBlind(i.connector());
+		}
 	}
 
 	public GList<ConnectableServer> buildConnectableServers()
@@ -366,6 +381,17 @@ public class ShadeServer extends Plugin implements Listener
 		{
 			ServerConfig.AUTO_RESTART__ENABLED = true;
 			runAutoRestartThread();
+		}
+	}
+
+	public void updateServerEffects(ServerEffects effects, ServerEffect added, String name, String bname)
+	{
+		this.effects = effects;
+		getProxy().getScheduler().schedule(this, () -> broadcastServerEffects(), 250, TimeUnit.MILLISECONDS);
+		broadcastServerEffects();
+		for(VirtualServer i : getServers().v())
+		{
+			new RBroadcast().colorBright(C.LIGHT_PURPLE).colorDark(C.DARK_PURPLE).message(name + " boosted ShadowRealms with \"" + bname + "\"").type("super").completeBlind(i.connector());
 		}
 	}
 }
