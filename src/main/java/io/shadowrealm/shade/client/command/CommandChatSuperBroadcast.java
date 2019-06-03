@@ -2,7 +2,7 @@ package io.shadowrealm.shade.client.command;
 
 import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.ShadeClient;
-import io.shadowrealm.shade.common.messages.RBroadcastLarge;
+import io.shadowrealm.shade.common.messages.RBroadcast;
 import mortar.bukkit.command.MortarCommand;
 import mortar.bukkit.command.MortarSender;
 import mortar.logic.format.F;
@@ -28,7 +28,7 @@ public class CommandChatSuperBroadcast extends MortarCommand
 
 		C bright = C.LIGHT_PURPLE;
 		C dark = C.DARK_PURPLE;
-		new RBroadcastLarge().message(F.color(m)).colorBright(bright).colorDark(dark).completeBlind(Shade.connect());
+		new RBroadcast().message(F.color(m)).colorBright(bright).colorDark(dark).completeBlind(Shade.connect());
 
 		return true;
 	}
