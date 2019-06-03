@@ -1,8 +1,12 @@
 package io.shadowrealm.shade.client;
 
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
+import mortar.api.nms.Catalyst;
+import mortar.api.nms.FrameType;
 import mortar.api.sound.Audio;
 import mortar.api.sound.MFADistortion;
 import mortar.compute.math.M;
@@ -164,5 +168,16 @@ public class Styles
 	public static void superBorderFiltered(Player i, String message, TextFilter f)
 	{
 		superHR(i, filter("            \u2720" + message + " \u2720", f), 6, 3, f);
+	}
+
+	public static void chatBroadcast(Player i, String string)
+	{
+		i.sendMessage(string);
+		soundAlert(i);
+	}
+
+	public static void toastBroadcast(Player i, String string)
+	{
+		Catalyst.host.sendAdvancement(i, FrameType.CHALLANGE, new ItemStack(Material.BOOK_AND_QUILL), string);
 	}
 }
