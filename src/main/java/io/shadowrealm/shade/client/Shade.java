@@ -218,20 +218,30 @@ public class Shade
 		return ShadeClient.instance.getConnector();
 	}
 
-	public static void changeChatColor(C i, Player player)
+	public static void changeChatColor(String i, Player player)
 	{
-		JSONObject o = getSettings(player).put("chat-color", i.name());
+		JSONObject o = getSettings(player).put("chat-color", i);
 		setSettings(player.getUniqueId(), o);
 		player.closeInventory();
 
-		if(i.equals(C.MAGIC))
+		try
 		{
-			Styles.superBorderRGB(player, "Chat Color Changed to RGB");
+			C c = C.valueOf(i);
+			Styles.superBorder(player, i + "Chat Color Changed to " + F.capitalizeWords(i.toLowerCase().replaceAll("_", " ")), c, C.DARK_GRAY);
 		}
 
-		else
+		catch(Throwable e)
 		{
-			Styles.superBorder(player, i + "Chat Color Changed to " + F.capitalizeWords(i.name().toLowerCase().replaceAll("_", " ")), i, C.DARK_GRAY);
+			try
+			{
+				TextFilter f = TextFilter.valueOf(i);
+				Styles.superBorderFiltered(player, i + "Chat Color Changed to " + F.capitalizeWords(i.toLowerCase().replaceAll("_", " ")), f);
+			}
+
+			catch(Throwable ee)
+			{
+				ee.printStackTrace();
+			}
 		}
 	}
 

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import io.shadowrealm.shade.client.Styles;
+import io.shadowrealm.shade.client.TextFilter;
 import io.shadowrealm.shade.common.table.ShadowAccount;
 import io.shadowrealm.shade.common.table.ShadowRank;
 import io.shadowrealm.shade.common.table.ShadowUnlock;
@@ -127,7 +127,11 @@ public class OSQL
 			}
 		}
 
-		generateUnlock("chat:color_rgb", false, true, Styles.rgbify("RGB Chat Color").replaceAll("\\Q" + C.COLOR_CHAR + "\\E", "&"), Styles.rgbify("Grants the ability to use all the colors when chatting.").replaceAll("\\Q" + C.COLOR_CHAR + "\\E", "&"), 1650);
+		for(TextFilter i : TextFilter.values())
+		{
+			String name = F.capitalize(i.name().toLowerCase().replaceAll("_", " "));
+			generateUnlock("chat:color_" + i.name().toLowerCase(), false, true, name + " Chat Color", "Grants the ability to use " + name + " chat colors.", 2530);
+		}
 
 		// Loot Boxes & Shards
 		generateUnlock("loot:box", true, false, "Loot Box", "There's stuff inside. Open it.", 10);

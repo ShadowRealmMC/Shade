@@ -11,6 +11,7 @@ import org.bukkit.event.server.TabCompleteEvent;
 import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.ShadeClient;
 import io.shadowrealm.shade.client.Styles;
+import io.shadowrealm.shade.client.TextFilter;
 import io.shadowrealm.shade.client.command.CommandChat;
 import io.shadowrealm.shade.client.command.CommandShout;
 import io.shadowrealm.shade.module.api.ShadeModule;
@@ -173,6 +174,7 @@ public class SMChat extends ShadeModule
 		{
 			JSONObject settings = Shade.getSettings(e.getPlayer());
 			C i = C.valueOf(defaultChatColor);
+			TextFilter f = null;
 
 			try
 			{
@@ -181,12 +183,20 @@ public class SMChat extends ShadeModule
 
 			catch(Throwable ex)
 			{
+				try
+				{
+					f = TextFilter.valueOf(settings.getString("chat-color"));
+				}
 
+				catch(Throwable exx)
+				{
+
+				}
 			}
 
-			if(i.equals(C.MAGIC))
+			if(f != null)
 			{
-				e.setMessage(Styles.rgbify(e.getMessage()));
+				e.setMessage(Styles.filter(e.getMessage(), f));
 			}
 
 			else

@@ -12,18 +12,16 @@ import mortar.util.text.C;
 
 public class Styles
 {
-	private static final String[] RGB = new String[] {C.RED.toString(), C.GREEN.toString(), C.BLUE.toString(), C.AQUA.toString(), C.YELLOW.toString(), C.LIGHT_PURPLE.toString(), C.GOLD.toString()};
-
-	public static String rgbify(String s)
+	public static String filter(String s, TextFilter f)
 	{
 		s = C.stripColor(s);
 		StringBuilder buffer = new StringBuilder(s.length());
 		char[] charbuf = s.toCharArray();
-		int offset = M.rand(0, RGB.length);
+		int offset = M.rand(0, f.getPrefixes().length);
 
 		for(int i = 0; i < charbuf.length; i++)
 		{
-			buffer.append(RGB[(i + offset) % RGB.length] + charbuf[i]);
+			buffer.append(f.getPrefixes()[(i + offset) % f.getPrefixes().length] + charbuf[i]);
 		}
 
 		return buffer.toString();
@@ -104,7 +102,7 @@ public class Styles
 		superHRSilent(i, F.color(C.GREEN + "            \u2720 " + C.GREEN + "&l" + message + C.GREEN + " \u2720"), C.GREEN, C.DARK_GREEN, 3, 2);
 	}
 
-	private static void superHR(Player i, String v, int height, int offset)
+	private static void superHR(Player i, String v, int height, int offset, TextFilter f)
 	{
 		soundAlert(i);
 		for(int j = 0; j < height; j++)
@@ -118,12 +116,12 @@ public class Styles
 					k = k + (Math.random() < 0.11 ? C.WHITE + (M.r(0.45) ? "\u25CF" : "\u2022") : " ");
 				}
 
-				i.sendMessage(rgbify(k));
+				i.sendMessage(filter(k, f));
 			}
 
 			if(j == height - offset)
 			{
-				i.sendMessage(rgbify(v));
+				i.sendMessage(filter(v, f));
 			}
 		}
 	}
@@ -163,8 +161,8 @@ public class Styles
 		superHR(i, mainline, C.YELLOW, C.GOLD, 120, 5);
 	}
 
-	public static void superBorderRGB(Player i, String message)
+	public static void superBorderFiltered(Player i, String message, TextFilter f)
 	{
-		superHR(i, rgbify("            \u2720" + message + " \u2720"), 6, 3);
+		superHR(i, filter("            \u2720" + message + " \u2720", f), 6, 3, f);
 	}
 }

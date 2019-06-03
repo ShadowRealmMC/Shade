@@ -4,7 +4,7 @@ import org.bukkit.Material;
 
 import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.ShadeClient;
-import io.shadowrealm.shade.client.Styles;
+import io.shadowrealm.shade.client.TextFilter;
 import io.shadowrealm.shade.common.messages.RAccount;
 import io.shadowrealm.shade.common.messages.RGetAccount;
 import io.shadowrealm.shade.common.table.ShadowAccount;
@@ -45,8 +45,8 @@ public class CommandChatChangeColor extends MortarCommand
 						.setViewportHeight(2)
 						.setTitle("Choose a Color");
 				ShadowAccount a = ((RAccount)r).shadowAccount();
-				GSet<C> colors = new GSet<>();
-				colors.add(dc);
+				GSet<String> colors = new GSet<>();
+				colors.add(dc.name());
 
 				for(String i : a.getUnlocks().keySet())
 				{
@@ -61,17 +61,8 @@ public class CommandChatChangeColor extends MortarCommand
 					{
 						if(u.getId().startsWith("color_"))
 						{
-							if(u.getId().equals("color_rgb"))
-							{
-								colors.add(C.MAGIC);
-							}
-
-							else
-							{
-								colors.add(C.valueOf(u.getId().replaceAll("color_", "").toUpperCase()));
-							}
+							colors.add(u.getId().replaceAll("color_", "").toUpperCase());
 						}
-
 					}
 				}
 
@@ -90,14 +81,34 @@ public class CommandChatChangeColor extends MortarCommand
 
 				}
 
-				for(C i : colors)
+				for(String i : colors)
 				{
-					boolean equipped = i.equals(mi);
+					boolean equipped = i.equals(mi.name());
 
-					w.setElement(w.getPosition(m), w.getRow(m++), new UIElement("color-" + i.name())
-							.setMaterial(new MaterialBlock(Material.STAINED_GLASS_PANE, (byte) i.dye().getWoolData()))
+					C c = C.BLACK;
+
+					try
+					{
+						c = C.valueOf(i);
+					}
+
+					catch(Throwable e)
+					{
+						try
+						{
+							c = C.valueOf(TextFilter.valueOf(i).getPrefixes()[0]);
+						}
+
+						catch(Throwable ex)
+						{
+
+						}
+					}
+
+					w.setElement(w.getPosition(m), w.getRow(m++), new UIElement("color-" + i.toLowerCase())
+							.setMaterial(new MaterialBlock(Material.STAINED_GLASS_PANE, (byte) c.dye().getWoolData()))
 							.setEnchanted(equipped)
-							.setName(i.equals(C.MAGIC) ? Styles.rgbify((i.equals(C.MAGIC) ? "" : i) + F.capitalizeWords((i.name().equals("MAGIC") ? "RGB" : i.name()).toLowerCase().replaceAll("_", " ")) + " Chat Color") : (i.equals(C.MAGIC) ? "" : i) + F.capitalizeWords((i.name().equals("MAGIC") ? "RGB" : i.name()).toLowerCase().replaceAll("_", " ")) + " Chat Color")
+							.setName(i + F.capitalizeWords(i.toLowerCase().replaceAll("_", " ")) + " Chat Color")
 							.addLore(C.GRAY + (equipped ? "Currently Equipped" : "Left click to use this color."))
 							.onLeftClick((ele) -> Shade.changeChatColor(i, sender.player())));
 				}
