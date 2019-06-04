@@ -213,6 +213,7 @@ public class ShadeServer extends Plugin implements Listener
 									}
 								}
 
+								effects.addAll(TimeUnit.MINUTES.toMillis(5));
 								System.out.println("All servers should be rebooting.");
 								Thread.sleep(2000);
 								System.out.println("I'm Out.");
