@@ -44,6 +44,21 @@ public class Shade
 	private static ServerEffects effects = new ServerEffects();
 	private static final GMap<String, ConnectableServer> servers = new GMap<>();
 
+	public static void setTagLine(String tagline)
+	{
+
+	}
+
+	/**
+	 * Get the player controller
+	 *
+	 * @return the player controller
+	 */
+	public static ShadowPlayerController gpc()
+	{
+		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class));
+	}
+
 	/**
 	 * Re-Syncronize the player's account with the proxy. Used after transactions.
 	 *
@@ -54,8 +69,8 @@ public class Shade
 	{
 		J.a(() ->
 		{
-			((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).syncronizeStatistics(p);
-			((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).syncronize(p);
+			gpc().syncronizeStatistics(p);
+			gpc().syncronize(p);
 		});
 	}
 
@@ -212,7 +227,7 @@ public class Shade
 	 */
 	public static ShadowRank computeRank(Player player)
 	{
-		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).computeRank(getAccount(player));
+		return gpc().computeRank(getAccount(player));
 	}
 
 	/**
@@ -224,7 +239,7 @@ public class Shade
 	 */
 	public static ShadowRank computeRank(UUID player)
 	{
-		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).computeRank(getAccount(player));
+		return gpc().computeRank(getAccount(player));
 	}
 
 	/**
@@ -321,7 +336,7 @@ public class Shade
 			{
 				if(i.getUniqueId().equals(p.getUniqueId()))
 				{
-					((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(i).setUnlocks(((RAccount) new RGetAccount().player(i.getUniqueId()).complete(connect())).shadowAccount().getUnlocks());
+					gpc().getAccount(i).setUnlocks(((RAccount) new RGetAccount().player(i.getUniqueId()).complete(connect())).shadowAccount().getUnlocks());
 					break;
 				}
 			}
@@ -387,7 +402,7 @@ public class Shade
 	 */
 	public static Statistics getStatistics(Player p)
 	{
-		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getStats(p);
+		return gpc().getStats(p);
 	}
 
 	/**
@@ -402,7 +417,7 @@ public class Shade
 	{
 		J.a(() ->
 		{
-			((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).syncronizeStatistics(p);
+			gpc().syncronizeStatistics(p);
 			stats.run(getStatistics(p));
 		});
 	}
@@ -460,7 +475,7 @@ public class Shade
 	 */
 	public static ShadowAccount getAccount(Player id)
 	{
-		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(id);
+		return gpc().getAccount(id);
 	}
 
 	/**
@@ -477,7 +492,7 @@ public class Shade
 		{
 			if(i.getUniqueId().equals(id))
 			{
-				return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(i);
+				return gpc().getAccount(i);
 			}
 		}
 
@@ -506,7 +521,7 @@ public class Shade
 				{
 					if(i.getUniqueId().equals(player))
 					{
-						((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(i).setUnlocks(((RAccount) new RGetAccount().player(i.getUniqueId()).complete(connect())).shadowAccount().getUnlocks());
+						gpc().getAccount(i).setUnlocks(((RAccount) new RGetAccount().player(i.getUniqueId()).complete(connect())).shadowAccount().getUnlocks());
 						break;
 					}
 				}
@@ -567,7 +582,7 @@ public class Shade
 	 */
 	public static GList<ShadowUnlock> getUnlocks()
 	{
-		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getUnlocks();
+		return gpc().getUnlocks();
 	}
 
 	/**
@@ -579,14 +594,14 @@ public class Shade
 	 */
 	public static Map<String, UnlockedItem> getUnlocks(Player p)
 	{
-		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(p).getUnlocks();
+		return gpc().getAccount(p).getUnlocks();
 	}
 
 	public static GList<UnlockedItem> getUnlocksForType(Player p, String type)
 	{
 		GList<UnlockedItem> t = new GList<>();
 
-		for(UnlockedItem i : ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(p).getUnlocks().values())
+		for(UnlockedItem i : gpc().getAccount(p).getUnlocks().values())
 		{
 			if(getUnlock(i.getId()).getType().equals(type))
 			{
@@ -671,7 +686,7 @@ public class Shade
 	 */
 	public static GList<ShadowRank> getRanks()
 	{
-		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getRanks();
+		return gpc().getRanks();
 	}
 
 	/**
