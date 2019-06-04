@@ -1,11 +1,13 @@
 package io.shadowrealm.shade.client.command;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import io.shadowrealm.shade.client.Shade;
 import io.shadowrealm.shade.client.ShadeClient;
 import io.shadowrealm.shade.client.Styles;
+import io.shadowrealm.shade.common.ServerEffect;
 import io.shadowrealm.shade.common.UnlockedItem;
 import io.shadowrealm.shade.common.table.ShadowUnlock;
 import mortar.api.inventory.UIElement;
@@ -17,7 +19,10 @@ import mortar.api.sched.J;
 import mortar.api.world.MaterialBlock;
 import mortar.bukkit.command.MortarCommand;
 import mortar.bukkit.command.MortarSender;
+import mortar.compute.math.M;
 import mortar.lang.collection.GList;
+import mortar.lang.collection.GSet;
+import mortar.logic.format.F;
 import mortar.util.text.C;
 
 public class CommandBooster extends MortarCommand
@@ -31,46 +36,53 @@ public class CommandBooster extends MortarCommand
 	@Override
 	public boolean handle(MortarSender sender, String[] args)
 	{
-		GList<UnlockedItem> t = new GList<>();
+		GSet<String> s = new GSet<String>();
 
-		for(ShadowUnlock i : Shade.getUnlocksForType("booster"))
+		for(ServerEffect i : Shade.getActiveBoosters())
 		{
-			if(Shade.hasUnlock(sender.player(), i.getId()))
-			{
-				t.add(Shade.getUnlock(sender.player(), i.getId()));
-			}
+			sender.sendMessage(C.WHITE + Shade.getUnlock(i.getId()).getName() + C.GRAY + " lasts for another " + F.timeLong(i.getEndsAt() - M.ms(), 0));
+			s.addAll(i.getContributors());
 		}
 
-		//@builder
-		Window w = new UIWindow(sender.player())
-				.setTitle("Boosters")
-				.setResolution(WindowResolution.W3_H3)
-				.setDecorator(new UIPaneDecorator(C.DARK_GRAY));
-		//@done
-		int m = 0;
-		for(UnlockedItem i : t)
+		if(!s.isEmpty())
 		{
-			ShadowUnlock r = Shade.getUnlock(i.getId());
-			//@builder
-			w.setElement(w.getPosition(m), w.getRow(m), new UIElement("ulb-" + i.getId())
-					.setCount(i.getAmount())
-					.setMaterial(new MaterialBlock(Material.NETHER_STAR))
-					.setName(C.LIGHT_PURPLE + r.getFormattedName())
-					.addLore(C.GRAY + r.getFormattedDescription())
-					.addLore(C.GREEN + "Left Click to boost ShadowRealms!")
-					.onLeftClick((e) -> boost(sender.player(), i.getId())));
-			//@done
-			m++;
+			sender.sendMessage(C.WHITE + "Contributors: ");
 		}
+
+		sender.sendMessage(new GList<String>(s).toString(", "));
+
+		GList<UnlockedItem> t = Shade.getUnlocksForType(sender.player(), "booster");
 
 		if(t.isEmpty())
 		{
-			w.close();
 			sender.sendMessage("You do not have any boosters!");
 		}
 
 		else
 		{
+			//@builder
+			Window w = new UIWindow(sender.player())
+					.setTitle("Boosters")
+					.setResolution(WindowResolution.W3_H3)
+					.setDecorator(new UIPaneDecorator(C.DARK_GRAY));
+			//@done
+			int m = 0;
+			for(UnlockedItem i : t)
+			{
+				ShadowUnlock r = Shade.getUnlock(i.getId());
+
+				//@builder
+				w.setElement(w.getPosition(m), w.getRow(m), new UIElement("ulb-" + i.getId())
+						.setCount(i.getAmount())
+						.setMaterial(new MaterialBlock(Material.NETHER_STAR))
+						.setName(C.LIGHT_PURPLE + r.getFormattedName())
+						.addLore(C.GRAY + r.getFormattedDescription())
+						.addLore(C.GREEN + "Left Click to boost ShadowRealms!")
+						.onLeftClick((e) -> boost(sender.player(), i.getId())));
+				//@done
+				m++;
+			}
+
 			w.open();
 		}
 
@@ -81,16 +93,20 @@ public class CommandBooster extends MortarCommand
 	{
 		player.closeInventory();
 
+		Shade.syncronizeAccount(player);
 		J.a(() ->
 		{
 			if(Shade.activateBooster(player, Shade.getUnlock(id)))
 			{
 				Styles.chatBroadcast(player, C.GRAY + "Activated Booster!");
+
+				J.a(() -> Shade.syncronizeAccount(player), 10);
 			}
 
 			else
 			{
-				Styles.chatBroadcast(player, C.GRAY + "Failed to activate booster for some reason...");
+				Shade.unlock(new MortarSender(Bukkit.getConsoleSender()), player.getName(), player.getUniqueId(), new UnlockedItem(id, 1));
+				Styles.chatBroadcast(player, C.GRAY + "Failed to activate booster for some reason... Refunded booster.");
 			}
 		});
 	}

@@ -37,20 +37,70 @@ import mortar.lang.json.JSONObject;
 import mortar.lib.control.MojangProfileController;
 import mortar.logic.format.F;
 import mortar.util.text.C;
+import mortar.util.text.D;
 
 public class Shade
 {
 	private static ServerEffects effects = new ServerEffects();
 	private static final GMap<String, ConnectableServer> servers = new GMap<>();
 
+	/**
+	 * Re-Syncronize the player's account with the proxy. Used after transactions.
+	 *
+	 * @param p
+	 *            the player.
+	 */
+	public static void syncronizeAccount(Player p)
+	{
+		J.a(() ->
+		{
+			((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).syncronizeStatistics(p);
+			((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).syncronize(p);
+		});
+	}
+
+	/**
+	 * Activate a booster from a player's unlock
+	 *
+	 * @param p
+	 *            the player
+	 * @param u
+	 *            the unlock
+	 * @return returns true if the booster was spent and activated.
+	 */
 	public static boolean activateBooster(Player p, ShadowUnlock u)
 	{
 		if(hasUnlock(p, u.getId()))
 		{
-			if(effects.addEffect(u, 1) && consumeUnlock(p, u.getId()))
+			if(consumeUnlock(p, u.getId()))
 			{
-				new RAddServerEffect().effects(effects).effect(new ServerEffect(u.getId(), M.ms() + 10000)).player(p.getName()).completeBlind(connect());
-				return true;
+				if(effects.addEffect(u, 1, p.getName()))
+				{
+					for(ServerEffect si : effects.getEffects())
+					{
+						if(si.getId().equals(u.getId()))
+						{
+							new RAddServerEffect().effects(effects).effect(si).player(p.getName()).completeBlind(connect());
+							return true;
+						}
+					}
+
+					System.out.println("No effect was found for booster in effects list...");
+				}
+
+				else
+				{
+					System.out.println("Effect failed to consume");
+					if(giveUnlock(p, new UnlockedItem(u.getId(), 1)))
+					{
+						D.as("Shade").v("Refunded " + u.getId() + " x1 to " + p.getName());
+					}
+
+					else
+					{
+						D.as("Shade").w("Failed to refund " + u.getId() + " x1 to " + p.getName());
+					}
+				}
 			}
 		}
 
@@ -215,6 +265,7 @@ public class Shade
 	{
 		if(!getUnlock(id).isConsumable())
 		{
+			System.out.println("Unlock is not consumable");
 			return false;
 		}
 
@@ -222,6 +273,7 @@ public class Shade
 
 		if(item == null)
 		{
+			System.out.println("Item is null");
 			return false;
 		}
 
@@ -246,7 +298,41 @@ public class Shade
 			return true;
 		}
 
+		System.out.println("Proxy diddnt respond with ");
 		return false;
+	}
+
+	/**
+	 * Unlock an item for the player
+	 *
+	 * @param p
+	 *            the player
+	 * @param item
+	 *            the item
+	 * @return true if success
+	 */
+	public static boolean giveUnlock(Player p, UnlockedItem item)
+	{
+		RestlessObject r = new RUnlock().player(p.getUniqueId()).unlock(item).complete(Shade.connect());
+
+		if(r != null && r instanceof ROK)
+		{
+			for(Player i : P.onlinePlayers())
+			{
+				if(i.getUniqueId().equals(p.getUniqueId()))
+				{
+					((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(i).setUnlocks(((RAccount) new RGetAccount().player(i.getUniqueId()).complete(connect())).shadowAccount().getUnlocks());
+					break;
+				}
+			}
+
+			return true;
+		}
+
+		else
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -494,6 +580,22 @@ public class Shade
 	public static Map<String, UnlockedItem> getUnlocks(Player p)
 	{
 		return ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(p).getUnlocks();
+	}
+
+	public static GList<UnlockedItem> getUnlocksForType(Player p, String type)
+	{
+		GList<UnlockedItem> t = new GList<>();
+
+		for(UnlockedItem i : ((ShadowPlayerController) ShadeClient.instance.getController(ShadowPlayerController.class)).getAccount(p).getUnlocks().values())
+		{
+			if(getUnlock(i.getId()).getType().equals(type))
+			{
+				t.add(i);
+			}
+		}
+
+		return t;
+
 	}
 
 	/**

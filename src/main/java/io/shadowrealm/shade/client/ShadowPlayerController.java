@@ -214,6 +214,21 @@ public class ShadowPlayerController extends Controller
 		return shadows.get(player);
 	}
 
+	public void syncronize(Player p)
+	{
+		new RGetAccount().player(p.getUniqueId()).complete(Shade.connect(), (r) ->
+		{
+			if(r instanceof RAccount)
+			{
+				RAccount a = (RAccount) r;
+				ShadowAccount ac = a.shadowAccount();
+				ac.setCachedName(p.getName());
+				ac.setCachedServer(ClientConfig.SERVER__ID);
+				shadows.put(p, ac);
+			}
+		});
+	}
+
 	@EventHandler
 	public void on(PlayerJoinEvent e)
 	{
@@ -299,7 +314,7 @@ public class ShadowPlayerController extends Controller
 
 	public GList<ShadowUnlock> getUnlocks()
 	{
-		return unlocks;
+		return new GList<>(unlocks);
 	}
 
 	public ConnectableServer getLastState()

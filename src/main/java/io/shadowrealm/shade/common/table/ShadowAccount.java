@@ -268,11 +268,11 @@ public class ShadowAccount
 
 	public UnlockedItem getUnlock(String id)
 	{
-		return hasUnlock(id) ? getUnlocks().get(id.contains(":") ? id.split(":")[1] : id) : null;
+		return getUnlocks().get(id);
 	}
 
 	public boolean hasUnlock(String id)
 	{
-		return getUnlocks().containsKey(id.contains(":") ? id.split(":")[1] : id);
+		return getUnlocks().containsKey(id);
 	}
 }

@@ -11,6 +11,7 @@ import io.shadowrealm.shade.server.ShadeServer;
 import mortar.api.sql.UniversalParser;
 import mortar.api.sql.UniversalType;
 import mortar.compute.math.M;
+import mortar.lang.collection.GList;
 import mortar.lang.json.JSONObject;
 import mortar.logic.format.F;
 import mortar.logic.io.VIO;
@@ -39,6 +40,8 @@ public class ServerEffects
 
 	public ServerEffect get(String id)
 	{
+		update();
+
 		for(ServerEffect i : effects)
 		{
 			if(i.getId().equals(id) || (id.contains(":") && id.split(":")[1].equals(i.getId())))
@@ -50,8 +53,29 @@ public class ServerEffects
 		return null;
 	}
 
+	public void update()
+	{
+		boolean save = false;
+
+		for(ServerEffect i : new GList<>(effects))
+		{
+			if(M.ms() >= i.getEndsAt())
+			{
+				System.out.println("Removed Effect " + i.getId() + " TIME: " + F.stamp(M.ms()) + " Ends At " + F.stamp(i.getEndsAt()));
+				effects.remove(i);
+				save = true;
+			}
+		}
+
+		if(save)
+		{
+			save();
+		}
+	}
+
 	public void addAll(long time)
 	{
+		update();
 		for(ServerEffect i : effects)
 		{
 			i.setEndsAt(i.getEndsAt() + time);
@@ -60,10 +84,11 @@ public class ServerEffects
 		save();
 	}
 
-	public boolean addEffect(ShadowUnlock u, int points)
+	public boolean addEffect(ShadowUnlock u, int points, String playername)
 	{
+		update();
 		JSONObject meta = new JSONObject(u.getMeta());
-		long timeAdd = points * meta.getInt("duration");
+		long timeAdd = points * (meta.getInt("duration") * TimeUnit.MINUTES.toMillis(1));
 
 		for(ServerEffect i : effects)
 		{
@@ -71,10 +96,17 @@ public class ServerEffects
 			{
 				if((i.getEndsAt() + timeAdd) - M.ms() > TimeUnit.MINUTES.toMillis(ServerConfig.BOOSTERS__MAXIMUM_MINUTES))
 				{
+					System.out.println("Would Exceed the server time limit for a single booster.");
 					return false;
 				}
 
-				i.setEndsAt(i.getEndsAt() + timeAdd);
+				i.setEndsAt(Math.max(i.getEndsAt(), M.ms()) + timeAdd);
+
+				if(!i.getContributors().contains(playername))
+				{
+					i.getContributors().add(playername);
+				}
+
 				save();
 				return true;
 			}
@@ -82,10 +114,13 @@ public class ServerEffects
 
 		if(timeAdd > TimeUnit.MINUTES.toMillis(ServerConfig.BOOSTERS__MAXIMUM_MINUTES))
 		{
+			System.out.println("Would Exceed the server time limit for a single booster.");
 			return false;
 		}
 
-		effects.add(new ServerEffect(u.getId(), M.ms() + timeAdd));
+		ServerEffect eff = new ServerEffect(u.getId(), M.ms() + timeAdd);
+		eff.getContributors().add(playername);
+		effects.add(eff);
 		save();
 		return true;
 	}
@@ -99,7 +134,9 @@ public class ServerEffects
 		{
 			try
 			{
-				return UniversalParser.fromJSON(new JSONObject(VIO.readAll(f)), ServerEffects.class);
+				ServerEffects ss = UniversalParser.fromJSON(new JSONObject(VIO.readAll(f)), ServerEffects.class);
+				ss.update();
+				return ss;
 			}
 
 			catch(Throwable e)
@@ -136,6 +173,7 @@ public class ServerEffects
 
 	public List<ServerEffect> getEffects()
 	{
+		update();
 		return effects;
 	}
 
