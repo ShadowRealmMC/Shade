@@ -44,9 +44,26 @@ public class Shade
 	private static ServerEffects effects = new ServerEffects();
 	private static final GMap<String, ConnectableServer> servers = new GMap<>();
 
+	/**
+	 * Set the server's tagline. Use an empty string for no tagline
+	 *
+	 * @param tagline
+	 *            the tagline
+	 */
 	public static void setTagLine(String tagline)
 	{
+		gpc().setTagline(tagline);
+	}
 
+	/**
+	 * Set the server status (its usually controlled automatically "online")
+	 *
+	 * @param status
+	 *            the status
+	 */
+	public static void setStatus(String status)
+	{
+		gpc().setStatus(status);
 	}
 
 	/**

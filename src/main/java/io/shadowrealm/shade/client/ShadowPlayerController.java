@@ -356,4 +356,64 @@ public class ShadowPlayerController extends Controller
 
 		return stats.get(p);
 	}
+
+	public GMap<Player, Statistics> getStats()
+	{
+		return stats;
+	}
+
+	public void setStats(GMap<Player, Statistics> stats)
+	{
+		this.stats = stats;
+	}
+
+	public void setShadows(GMap<Player, ShadowAccount> shadows)
+	{
+		this.shadows = shadows;
+	}
+
+	public void setRanks(GList<ShadowRank> ranks)
+	{
+		this.ranks = ranks;
+	}
+
+	public void setUnlocks(GList<ShadowUnlock> unlocks)
+	{
+		this.unlocks = unlocks;
+	}
+
+	public void setCycleInterval(long cycleInterval)
+	{
+		this.cycleInterval = cycleInterval;
+	}
+
+	public void setLastState(ConnectableServer lastState)
+	{
+		this.lastState = lastState;
+	}
+
+	public void setStatus(String status)
+	{
+		this.status = status;
+	}
+
+	public void setTagline(String tagline)
+	{
+		this.tagline = tagline;
+	}
+
+	public void setSince(long since)
+	{
+		this.since = since;
+	}
+
+	public void setOnline(int online)
+	{
+		this.online = online;
+	}
+
+	public void setLatch(ChronoLatch latch)
+	{
+		this.latch = latch;
+	}
 }
