@@ -1,23 +1,24 @@
 package io.shadowrealm.shade.module;
 
-import java.util.List;
-
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import io.shadowrealm.shade.client.ShadeClient;
 import io.shadowrealm.shade.module.api.ShadeModule;
 import mortar.api.config.Key;
+import mortar.api.sched.J;
 import mortar.api.world.Area;
-import mortar.bukkit.data.DataRipper;
-import mortar.lang.collection.GMap;
+import mortar.compute.math.M;
+import mortar.logic.format.F;
+import mortar.util.text.C;
 
 public class SMMobStacker extends ShadeModule
 {
@@ -25,11 +26,10 @@ public class SMMobStacker extends ShadeModule
 	public static double stackSearchRadius = 16;
 
 	@Key("max-stack-size")
-	public static int maxStackSize = 16;
+	public static int maxStackSize = 30;
 
 	@Key("enable")
 	public static boolean enabled = true;
-	private GMap<World, List<Integer>> stackedMobs;
 
 	public SMMobStacker()
 	{
@@ -38,10 +38,38 @@ public class SMMobStacker extends ShadeModule
 
 	public void setCount(Entity a, int count)
 	{
-		a.setCustomName(count + "x");
-		a.setCustomNameVisible(true);
+		if(a instanceof LivingEntity)
+		{
+			// Prevent entities from duping equipment drops
+			LivingEntity le = (LivingEntity) a;
+			le.getEquipment().setBootsDropChance(0f);
+			le.getEquipment().setHelmetDropChance(0f);
+			le.getEquipment().setChestplateDropChance(0f);
+			le.getEquipment().setLeggingsDropChance(0f);
+			le.getEquipment().setItemInMainHandDropChance(0f);
+			le.getEquipment().setItemInOffHandDropChance(0f);
+		}
 
 		a.setMetadata("stack-count", new FixedMetadataValue(ShadeClient.instance, Math.max(1, count)));
+		showStack(a);
+	}
+
+	public void showStack(Entity e)
+	{
+		int stackSize = getCount(e);
+
+		if(stackSize > 1)
+		{
+			String sx = F.capitalizeWords(C.WHITE + e.getType().toString().toLowerCase().replaceAll("_", " ")) + " " + C.GRAY + M.toRoman(stackSize);
+			e.setCustomName(sx);
+			J.s(() ->
+			{
+				if(!e.isDead() && e.getCustomName().equals(sx))
+				{
+					e.setCustomName("");
+				}
+			}, 50);
+		}
 	}
 
 	public int getCount(Entity a)
@@ -88,23 +116,33 @@ public class SMMobStacker extends ShadeModule
 		return a.hasMetadata("spawner-entity") ? a.getMetadata("spawner-entity").get(0).asBoolean() : false;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
-	public void on(EntityDamageEvent e)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
+	public void on(EntityDamageByEntityEvent e)
+	{
+		if(e.getDamager() instanceof Player && !(e.getEntity() instanceof Player))
+		{
+			showStack(e.getEntity());
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void on(EntityDeathEvent e)
 	{
 		if(e.getEntity() instanceof LivingEntity)
 		{
-			LivingEntity le = (LivingEntity) e.getEntity();
-
-			if(getCount(e.getEntity()) > 1 && le.getHealth() - e.getFinalDamage() <= 0)
+			if(getCount(e.getEntity()) > 1)
 			{
-				le.setHealth(le.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-				DataRipper.forceDeathSequence(le, le);
-				setCount(e.getEntity(), getCount(e.getEntity()) - 1);
+				for(ItemStack i : e.getDrops())
+				{
+					i.setAmount((int) (i.getAmount() * getCount(e.getEntity()) * (1D - (Math.random() * Math.random()))));
+				}
+
+				e.setDroppedExp(e.getDroppedExp() * getCount(e.getEntity()));
 			}
 		}
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void on(SpawnerSpawnEvent e)
 	{
 		setSpawnerEntity(e.getEntity(), true);
@@ -113,8 +151,10 @@ public class SMMobStacker extends ShadeModule
 		{
 			if(i.getType().equals(e.getEntityType()) && isSpawnerEntity(i))
 			{
-				stack(i, e.getEntity());
-				break;
+				if(stack(i, e.getEntity()))
+				{
+					break;
+				}
 			}
 		}
 	}
