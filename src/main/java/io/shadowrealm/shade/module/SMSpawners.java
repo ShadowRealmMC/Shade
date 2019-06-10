@@ -42,7 +42,7 @@ public class SMSpawners extends ShadeModule
 	public static double maxDistance = 16;
 
 	@Key("tweaks.spawn-interval")
-	public static int spawnInterval = 60;
+	public static int spawnInterval = 100;
 
 	@Key("tweaks.max-entities-nearby")
 	public static int maxNearby = 5;
