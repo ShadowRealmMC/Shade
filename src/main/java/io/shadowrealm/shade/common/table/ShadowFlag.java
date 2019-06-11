@@ -22,7 +22,7 @@ public class ShadowFlag
 	public static final TableCache<UUID, ShadowFlag> CACHE = new TableCache<UUID, ShadowFlag>(1024);
 
 	@Column(name = "id", type = "VARCHAR(36)", placeholder = "<ERROR: UNDEFINED>", primary = true)
-	private String id;
+	private UUID id;
 
 	@Column(name = "player", type = "VARCHAR(36)", placeholder = "ERROR")
 	private UUID player;
@@ -35,20 +35,20 @@ public class ShadowFlag
 
 	public ShadowFlag()
 	{
-		this("error");
+		this(UUID.randomUUID());
 	}
 
-	public ShadowFlag(String id)
+	public ShadowFlag(UUID id)
 	{
 		this.id = id;
 	}
 
-	public String getId()
+	public UUID getId()
 	{
 		return id;
 	}
 
-	public void setId(String id)
+	public void setId(UUID id)
 	{
 		this.id = id;
 	}

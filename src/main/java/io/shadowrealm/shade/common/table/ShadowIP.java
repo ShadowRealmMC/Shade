@@ -9,7 +9,7 @@ import mortar.api.sql.TableCache;
 @Table("shadow_ip")
 public class ShadowIP
 {
-	public static final TableCache<UUID, ShadowIP> CACHE = new TableCache<UUID, ShadowIP>(1024);
+	public static final TableCache<String, ShadowIP> CACHE = new TableCache<String, ShadowIP>(1024);
 
 	@Column(name = "id", type = "VARCHAR(320)", placeholder = "<ERROR: UNDEFINED>", primary = true)
 	private String id;
@@ -24,6 +24,11 @@ public class ShadowIP
 	public ShadowIP()
 	{
 		this(UUID.randomUUID(), "error");
+	}
+
+	public ShadowIP(String id)
+	{
+		this.id = id;
 	}
 
 	public ShadowIP(UUID player, String ip)
