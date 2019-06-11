@@ -403,15 +403,7 @@ public class ShadeServer extends Plugin implements Listener
 			@Override
 			public void run()
 			{
-				try
-				{
-					getSQL().getKit().set(sip);
-				}
-
-				catch(SQLException e)
-				{
-					e.printStackTrace();
-				}
+				getSQL().setIP(sip);
 			}
 		});
 	}
