@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 
 import io.shadowrealm.shade.client.TextFilter;
 import io.shadowrealm.shade.common.table.ShadowAccount;
+import io.shadowrealm.shade.common.table.ShadowFlag;
+import io.shadowrealm.shade.common.table.ShadowIP;
 import io.shadowrealm.shade.common.table.ShadowRank;
 import io.shadowrealm.shade.common.table.ShadowUnlock;
 import mortar.api.sql.SQLKit;
@@ -285,6 +287,44 @@ public class OSQL
 		return g;
 	}
 
+	public boolean setFlag(ShadowFlag a)
+	{
+		try
+		{
+			if(k.set(a))
+			{
+				ShadowFlag.CACHE.put(a.getId(), a);
+				return true;
+			}
+		}
+
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	public boolean setIP(ShadowIP a)
+	{
+		try
+		{
+			if(k.set(a))
+			{
+				ShadowIP.CACHE.put(a.getId(), a);
+				return true;
+			}
+		}
+
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
 	public boolean setAccount(ShadowAccount a)
 	{
 		try
@@ -381,6 +421,58 @@ public class OSQL
 			if(k.get(sa))
 			{
 				ShadowRank.CACHE.put(id, sa);
+				return sa;
+			}
+		}
+
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public ShadowFlag getIP(UUID id)
+	{
+		if(ShadowFlag.CACHE.has(id))
+		{
+			return ShadowFlag.CACHE.get(id);
+		}
+
+		ShadowFlag sa = new ShadowFlag(id);
+
+		try
+		{
+			if(k.get(sa))
+			{
+				ShadowFlag.CACHE.put(id, sa);
+				return sa;
+			}
+		}
+
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public ShadowIP getIP(String id)
+	{
+		if(ShadowIP.CACHE.has(id))
+		{
+			return ShadowIP.CACHE.get(id);
+		}
+
+		ShadowIP sa = new ShadowIP(id);
+
+		try
+		{
+			if(k.get(sa))
+			{
+				ShadowIP.CACHE.put(id, sa);
 				return sa;
 			}
 		}
