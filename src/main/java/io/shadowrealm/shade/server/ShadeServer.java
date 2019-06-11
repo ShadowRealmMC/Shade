@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.Servlet;
@@ -27,6 +30,7 @@ import io.shadowrealm.shade.common.messages.RKeptAlive;
 import io.shadowrealm.shade.common.messages.RReboot;
 import io.shadowrealm.shade.common.messages.RServerEffects;
 import io.shadowrealm.shade.common.messages.RServerStateChanged;
+import io.shadowrealm.shade.common.table.ShadowIP;
 import mortar.api.config.Configurator;
 import mortar.compute.math.M;
 import mortar.lang.collection.GList;
@@ -34,6 +38,7 @@ import mortar.lang.collection.GMap;
 import mortar.logic.format.F;
 import mortar.util.text.C;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -47,6 +52,7 @@ public class ShadeServer extends Plugin implements Listener
 	private ServerEffects effects;
 	private Calendar scheduledTime;
 	private Calendar currentTime;
+	private ExecutorService svc;
 	private OSQL osql;
 	public static ShadeServer instance;
 
@@ -74,6 +80,7 @@ public class ShadeServer extends Plugin implements Listener
 		getLogger().info("Processing Configuration");
 		getLogger().info("Connecting to MySQL jdbc:mysql://" + ServerConfig.DATABASE__ADDRESS + "/" + ServerConfig.DATABASE__NAME + "?username=" + ServerConfig.DATABASE__USER + "&password=" + F.repeat("*", ServerConfig.DATABASE__PASSWORD.length()));
 		Connection sql = null;
+		svc = Executors.newCachedThreadPool();
 		try
 		{
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -383,6 +390,30 @@ public class ShadeServer extends Plugin implements Listener
 			ServerConfig.AUTO_RESTART__ENABLED = true;
 			runAutoRestartThread();
 		}
+	}
+
+	@EventHandler
+	public void on(ServerConnectEvent e)
+	{
+		UUID id = e.getPlayer().getUniqueId();
+		String ip = e.getPlayer().getAddress().getHostName();
+		ShadowIP sip = new ShadowIP(id, ip);
+		svc.submit(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					getSQL().getKit().set(sip);
+				}
+
+				catch(SQLException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	public void updateServerEffects(ServerEffects effects, ServerEffect added, String name, String bname)
