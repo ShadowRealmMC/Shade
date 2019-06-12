@@ -83,7 +83,7 @@ public class SMSpawners extends ShadeModule
 
 						else
 						{
-							updateSpawner(s);
+							setSpawnerLevel(s, 1);
 						}
 					}
 				}
@@ -113,11 +113,42 @@ public class SMSpawners extends ShadeModule
 		BlockMetaStackedSpawner m = new BlockMetaStackedSpawner(s);
 		m.setLevel(level);
 		m.save();
+		updateSpawner(s);
 	}
 
 	private void updateSpawner(CreatureSpawner s)
 	{
+		boolean modified = false;
+		SpawnerStackingConfig cfg = spawnerConfig.get(s.getSpawnedType());
+		int level = getSpawnerLevel(s);
+		int delay = cfg.getIntervalTicks(level);
+		int range = cfg.getActivationRange(level);
+		int count = cfg.getSpawnCount(level);
+		range *= 2;
 
+		if(s.getSpawnRange() != range)
+		{
+			modified = true;
+			s.setSpawnRange(range);
+		}
+
+		if(s.getMinSpawnDelay() != delay || s.getMaxSpawnDelay() != delay)
+		{
+			modified = true;
+			s.setMinSpawnDelay(delay);
+			s.setMaxSpawnDelay(delay);
+		}
+
+		if(s.getSpawnCount() != count)
+		{
+			modified = true;
+			s.setSpawnCount(count);
+		}
+
+		if(modified)
+		{
+			s.update();
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -129,6 +160,9 @@ public class SMSpawners extends ShadeModule
 			{
 				if(e.getClickedBlock().getType().equals(Material.MOB_SPAWNER))
 				{
+					CreatureSpawner s = (CreatureSpawner) e.getClickedBlock().getState();
+					SpawnerStackingConfig c = spawnerConfig.get(s.getSpawnedType());
+					int level = getSpawnerLevel(s);
 
 				}
 			}
@@ -139,6 +173,7 @@ public class SMSpawners extends ShadeModule
 	public void on(SpawnerSpawnEvent e)
 	{
 		CreatureSpawner s = e.getSpawner();
+		s.update();
 		Entity entity = e.getEntity();
 		entity.setSilent(true);
 
