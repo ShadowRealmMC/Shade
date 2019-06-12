@@ -6,6 +6,7 @@ import org.bukkit.entity.EntityType;
 
 import mortar.api.config.Configurator;
 import mortar.api.config.Key;
+import mortar.compute.math.M;
 
 public class SpawnerStackingConfig
 {
@@ -30,6 +31,12 @@ public class SpawnerStackingConfig
 	@Key("activation-range.max-level")
 	private int maxLevelActivation = 24;
 
+	@Key("max-nearby.min-level")
+	private int minLevelMaxNearby = 3;
+
+	@Key("max-nearby.max-level")
+	private int maxLevelMaxNearby = 8;
+
 	@Key("spawn-count.min-level")
 	private int minLevelSpawnCount = 1;
 
@@ -47,6 +54,31 @@ public class SpawnerStackingConfig
 	public SpawnerStackingConfig(EntityType type)
 	{
 		this.type = type;
+	}
+
+	public double getUpgradeCost(int level)
+	{
+		return ((double) level * upgradeCostLevelMultiplier) * upgradeCost;
+	}
+
+	public int getActivationRange(int level)
+	{
+		return (int) M.rangeScale(minLevelActivation, maxLevelActivation, 1, maxLevel, level);
+	}
+
+	public int getIntervalTicks(int level)
+	{
+		return (int) M.rangeScale(minLevelInterval, maxLevelInterval, 1, maxLevel, level);
+	}
+
+	public int getMaxNearby(int level)
+	{
+		return (int) M.rangeScale(minLevelMaxNearby, maxLevelMaxNearby, 1, maxLevel, level);
+	}
+
+	public int getSpawnCount(int level)
+	{
+		return (int) M.rangeScale(minLevelSpawnCount, maxLevelSpawnCount, 1, maxLevel, level);
 	}
 
 	public void load(File folder) throws Throwable
