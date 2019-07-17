@@ -163,6 +163,12 @@
 			<version>3.8.3_463</version>
 		</dependency>
 		<dependency>
+			<groupId>com.volmit</groupId>
+			<artifactId>Mortar</artifactId>
+			<version>1.0.66</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>deluxechat</groupId>
 			<artifactId>deluxechat</artifactId>
 			<version>1.0</version>
